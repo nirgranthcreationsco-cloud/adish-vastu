@@ -1,493 +1,259 @@
 "use client";
 
-import { Award, ChevronRight, Clock, Sparkles } from "lucide-react";
+import { Award, ChevronRight, Loader2, Sparkles } from "lucide-react";
+import { useTranslations } from 'next-intl';
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+
+interface DriveFolder {
+  id: string;
+  name: string;
+  mimeType: string;
+  thumbnailLink?: string;
+  description?: string;
+}
+
+function getCategoryLineArt(name: string) {
+  const normalized = name.toLowerCase();
+  
+  if (normalized.includes('gem') || normalized.includes('stone')) {
+    return (
+      <svg viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" className="w-12 h-12 sm:w-20 sm:h-20 text-amber-200/90 drop-shadow-[0_8px_16px_rgba(245,158,11,0.2)]">
+        <path d="M30 25 h40 l18 20 L50 85 L12 45 Z" />
+        <path d="M30 25 L45 45 L50 85 L55 45 L70 25" />
+        <path d="M12 45 h76" />
+        <path d="M45 45 L50 25 L55 45" />
+      </svg>
+    );
+  }
+  
+  if (normalized.includes('bracelet') || normalized.includes('bead')) {
+    return (
+      <svg viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="1.2" className="w-12 h-12 sm:w-20 sm:h-20 text-amber-200/90 drop-shadow-[0_8px_16px_rgba(245,158,11,0.2)]">
+        <circle cx="50" cy="50" r="30" strokeDasharray="3 3" opacity="0.3" />
+        <circle cx="50" cy="20" r="4" fill="currentColor" />
+        <circle cx="65" cy="24" r="4" fill="currentColor" />
+        <circle cx="76" cy="35" r="4" fill="currentColor" />
+        <circle cx="80" cy="50" r="4" fill="currentColor" />
+        <circle cx="76" cy="65" r="4" fill="currentColor" />
+        <circle cx="65" cy="76" r="4" fill="currentColor" />
+        <circle cx="50" cy="80" r="4" fill="currentColor" />
+        <circle cx="35" cy="76" r="4" fill="currentColor" />
+        <circle cx="24" cy="65" r="4" fill="currentColor" />
+        <circle cx="20" cy="50" r="4" fill="currentColor" />
+        <circle cx="24" cy="35" r="4" fill="currentColor" />
+        <circle cx="35" cy="24" r="4" fill="currentColor" />
+      </svg>
+    );
+  }
+  
+  if (normalized.includes('remedy') || normalized.includes('remedies') || normalized.includes('yantra')) {
+    return (
+      <svg viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="1.2" className="w-12 h-12 sm:w-20 sm:h-20 text-amber-200/90 drop-shadow-[0_8px_16px_rgba(245,158,11,0.2)]">
+        <circle cx="50" cy="50" r="40" />
+        <circle cx="50" cy="50" r="34" />
+        <rect x="26" y="26" width="48" height="48" rx="2" transform="rotate(45 50 50)" />
+        <polygon points="50,22 75,65 25,65" />
+        <polygon points="50,78 75,35 25,35" />
+        <circle cx="50" cy="50" r="8" fill="currentColor" opacity="0.1" />
+        <circle cx="50" cy="50" r="2.5" fill="currentColor" />
+      </svg>
+    );
+  }
+  
+  return (
+    <svg viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="1.2" className="w-12 h-12 sm:w-20 sm:h-20 text-amber-200/90 drop-shadow-[0_8px_16px_rgba(245,158,11,0.2)]">
+      <path d="M50 18 L80 44 L70 44 L70 82 L30 82 L30 44 L20 44 Z" />
+      <path d="M40 82 V60 H60 V82" />
+      <circle cx="50" cy="36" r="7" />
+      <path d="M50 46 L58 58 H42 Z" />
+    </svg>
+  );
+}
 
 export default function RemediesSection() {
+  const t = useTranslations('remedies');
+  const router = useRouter();
+  const [categories, setCategories] = useState<DriveFolder[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [isMockData, setIsMockData] = useState(false);
+
+  useEffect(() => {
+    fetchCategories();
+  }, []);
+
+  const fetchCategories = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch('/api/drive');
+      const data = await response.json();
+
+      if (!data.success) {
+        throw new Error(data.error);
+      }
+
+      const folders = data.items
+        .filter((item: DriveFolder) => item.mimeType === 'application/vnd.google-apps.folder')
+        .slice(0, 4);
+
+      setCategories(folders);
+      setIsMockData(data.isMock || false);
+    } catch (err: any) {
+      console.error('Error fetching categories:', err);
+      setError(err.message || 'Failed to load categories');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCategoryClick = (categoryName: string) => {
+    router.push(`/remedies/${encodeURIComponent(categoryName.replace(/\s+/g, '-'))}`);
+  };
+
   return (
-    <section className="relative py-20 md:py-32 overflow-hidden">
+    <section className="relative py-16 md:py-24 overflow-hidden bg-gradient-to-b from-orange-100 via-amber-50 to-orange-100">
       
-      {/* Mystical Background */}
-      <div className="absolute inset-0 bg-gradient-to-b from-orange-950 via-red-950/50 to-orange-950" />
-      
-      {/* Sacred Geometry Pattern */}
-      <div className="absolute inset-0 opacity-5">
-        <div
-          className="absolute inset-0"
-          style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M50 0 L100 50 L50 100 L0 50 Z' fill='none' stroke='%23fbbf24' stroke-width='0.5'/%3E%3Ccircle cx='50' cy='50' r='30' fill='none' stroke='%23fbbf24' stroke-width='0.5'/%3E%3C/svg%3E")`,
-            backgroundSize: "100px 100px"
-          }}
-        />
+      {/* Subtle Pattern */}
+      <div className="absolute inset-0 opacity-[0.03]">
+        <div className="absolute inset-0" style={{
+          backgroundImage: 'radial-gradient(circle at 2px 2px, rgba(251,191,36,0.5) 1px, transparent 0)',
+          backgroundSize: '42px 42px'
+        }} />
       </div>
 
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      {/* Mock Data Banner */}
+      {isMockData && (
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 mb-6">
+          <div className="bg-blue-100 border-2 border-blue-300 rounded-xl p-4 text-center">
+            <p className="text-blue-900 font-semibold">
+              🧪 Development Mode: Using mock data. Configure Google Drive API key to see real products.
+            </p>
+          </div>
+        </div>
+      )}
 
-        {/* SECTION HEADER */}
-        <div className="text-center mb-16 space-y-6">
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6">
 
-          {/* Sacred Symbol */}
-          <div className="flex justify-center mb-6">
-            <div className="relative">
-              <div className="w-28 h-28 border-2 border-amber-400/30 rotate-45 flex items-center justify-center animate-pulse">
-                <div className="w-24 h-24 border-2 border-amber-400/50 flex items-center justify-center -rotate-45">
-                  <div className="text-5xl text-amber-400">🔱</div>
-                </div>
-              </div>
-              <div className="absolute inset-0 bg-amber-400/20 blur-2xl animate-pulse" />
-            </div>
+        {/* HEADER */}
+        <div className="text-center mb-14">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-amber-100 border border-amber-300 rounded-full">
+            <Sparkles className="w-4 h-4 text-amber-700" />
+            <span className="text-sm text-amber-900">{t('badge')}</span>
           </div>
 
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-red-500/10 rounded-full border border-red-400/30">
-            <Sparkles className="w-4 h-4 text-red-400" />
-            <span className="text-sm font-medium text-red-300">
-              Energized & Consecrated by Adish
-            </span>
-          </div>
-
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white">
-            Sacred Remedies
-            <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-red-400 to-orange-400 animate-gradient">
-              Handpicked by Adish
+          <h2 className="text-3xl md:text-5xl font-bold text-slate-900 mt-4 leading-tight">
+            {t('title')}
+            <span className="block text-transparent bg-clip-text bg-gradient-to-r from-amber-600 to-orange-600">
+              {t('subtitle')}
             </span>
           </h2>
 
-          <p className="text-xl text-amber-200/80 max-w-3xl mx-auto leading-relaxed">
-            Every remedy personally selected, energized, and blessed by Master Adish. 
-            Not just products—sacred instruments of transformation.
+          <p className="text-slate-700 text-base md:text-lg max-w-xl mx-auto mt-3">
+            {t('description')}
           </p>
         </div>
 
-        {/* ADISH NOTE */}
-        <div className="mb-16 max-w-4xl mx-auto">
-          <div className="relative p-8 md:p-12 bg-gradient-to-br from-amber-900/40 via-orange-900/40 to-red-900/40 rounded-3xl border-2 border-amber-400/30 backdrop-blur-sm">
-            <div className="flex flex-col md:flex-row gap-6 items-center">
+        {/* CATEGORY CARDS */}
+        <h3 className="text-2xl md:text-4xl text-slate-900 font-bold mb-8 text-center">
+          {t('sectionTitle')}
+        </h3>
 
-              {/* Avatar */}
-              <div className="flex-shrink-0">
-                <div className="w-24 h-24 md:w-32 md:h-32 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center border-4 border-amber-400/50 shadow-2xl">
-                  <Sparkles className="w-12 h-12 md:w-16 md:h-16 text-white" />
-                </div>
-              </div>
-
-              {/* Message */}
-              <div className="flex-1 text-center md:text-left space-y-3">
-                <p className="text-amber-400 font-semibold text-sm uppercase tracking-wide">
-                  A Message from Adish
-                </p>
-                <blockquote className="text-lg md:text-xl text-white leading-relaxed italic">
-                  "I personally select each remedy with deep intention. Every yantra is consecrated, 
-                  every crystal charged, every item blessed with sacred mantras. These are not mere 
-                  objects—they are living instruments of divine energy, ready to transform your space 
-                  and consciousness."
-                </blockquote>
-                <div className="text-amber-300 font-serif text-3xl mt-4">
-                  — Adish
-                </div>
-              </div>
-            </div>
-
-            {/* Corners */}
-            <div className="absolute top-4 left-4 w-8 h-8 border-t-2 border-l-2 border-amber-400" />
-            <div className="absolute top-4 right-4 w-8 h-8 border-t-2 border-r-2 border-amber-400" />
-            <div className="absolute bottom-4 left-4 w-8 h-8 border-b-2 border-l-2 border-amber-400" />
-            <div className="absolute bottom-4 right-4 w-8 h-8 border-b-2 border-r-2 border-amber-400" />
+        {loading ? (
+          <div className="flex justify-center items-center py-20">
+            <Loader2 className="w-12 h-12 text-amber-600 animate-spin" />
           </div>
-        </div>
+        ) : error ? (
+          <div className="text-center py-20">
+            <p className="text-red-600 text-lg mb-4">{error}</p>
+            <button
+              onClick={fetchCategories}
+              className="px-6 py-3 bg-gradient-to-r from-amber-500 to-orange-500 text-white font-semibold rounded-lg hover:scale-105 transition-all"
+            >
+              Try Again
+            </button>
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mb-10">
+            {categories.map((category) => {
+              const name = category.name;
 
-        {/* FEATURED KITS */}
-        <div className="mb-16">
-          <h3 className="text-3xl md:text-4xl font-bold text-center text-white mb-12">
-            Adish's <span className="text-amber-400">Sacred Kits</span>
-          </h3>
-
-          <div className="grid md:grid-cols-3 gap-8">
-
-            {[
-              {
-                name: "Adish's Protection Kit",
-                subtitle: "Shield Your Space & Family",
-                items: ["Vastu Pyramid", "Black Tourmaline", "Protection Yantra", "Sacred Thread"],
-                price: "₹8,999",
-                icon: "🛡️",
-                gradient: "from-red-600 to-orange-600"
-              },
-              {
-                name: "Prosperity Kit",
-                subtitle: "Attract Abundance & Success",
-                items: ["Kuber Yantra", "Citrine Crystal", "Lakshmi Coin", "Prosperity Oil"],
-                price: "₹9,999",
-                icon: "💰",
-                gradient: "from-yellow-600 to-amber-600",
-                featured: true
-              },
-              {
-                name: "Relationship Harmony Kit",
-                subtitle: "Restore Love & Peace",
-                items: ["Rose Quartz Pair", "Harmony Yantra", "Couple Crystals", "Love Incense"],
-                price: "₹7,999",
-                icon: "💖",
-                gradient: "from-pink-600 to-rose-600"
-              }
-            ].map((kit, i) => (
-              <div
-                key={i}
-                className={`group relative bg-gradient-to-br from-white/5 to-white/10 rounded-2xl overflow-hidden backdrop-blur-sm border-2 transition-all duration-500 hover:scale-105 hover:shadow-2xl ${
-                  kit.featured
-                    ? "border-amber-400 shadow-xl shadow-amber-500/30"
-                    : "border-white/10 hover:border-amber-400/50"
-                }`}
-              >
-                {/** MOST POPULAR BADGE */}
-                {kit.featured && (
-                  <div className="absolute top-4 right-4 z-20 px-3 py-1.5 bg-gradient-to-r from-amber-500 to-orange-500 rounded-full shadow-lg">
-                    <span className="text-white text-xs font-bold">MOST POPULAR</span>
-                  </div>
-                )}
-
-                {/** KIT IMAGE */}
-                <div className="relative h-64">
-                  <div className={`absolute inset-0 bg-gradient-to-br ${kit.gradient}`} />
-
-                  <div className="absolute inset-0 flex items-center justify-center text-center">
-                    <div className="text-7xl mb-4 group-hover:scale-110 transition-transform">
-                      {kit.icon}
+              return (
+                <div
+                  key={category.id}
+                  onClick={() => handleCategoryClick(category.name)}
+                  className="group relative bg-[#ffffff] rounded-[1.5rem] sm:rounded-[2.5rem] border border-slate-100 hover:border-amber-400/50 p-2 sm:p-4 transition-all duration-500 hover:-translate-y-2 cursor-pointer shadow-[0_15px_40px_rgba(0,0,0,0.04)] hover:shadow-[0_30px_60px_rgba(245,158,11,0.12)]"
+                >
+                  <div className="relative h-28 sm:h-60 w-full rounded-[1rem] sm:rounded-[2rem] overflow-hidden bg-gradient-to-br from-neutral-950 via-stone-900 to-amber-950/80 shadow-xl border border-white/5">
+                    {/* Sacred Overlay */}
+                    <div className="absolute inset-0 bg-black/10 group-hover:bg-black/0 transition-colors duration-500" />
+                    
+                    {/* Animated Gold Glow */}
+                    <div className="absolute top-0 right-0 w-16 h-16 sm:w-32 sm:h-32 bg-amber-500/10 blur-[20px] sm:blur-[40px] rounded-full -mr-4 -mt-4 sm:-mr-8 sm:-mt-8 group-hover:scale-150 transition-transform duration-1000" />
+                    
+                    <div className="absolute inset-0 flex items-center justify-center group-hover:scale-110 transition-transform duration-700 ease-out">
+                      {getCategoryLineArt(name)}
+                    </div>
+                    
+                    <div className="absolute top-2 left-2 sm:top-5 sm:left-5 px-1.5 py-0.5 sm:px-3 sm:py-1 bg-white/5 backdrop-blur-md border border-white/10 rounded-full shadow-lg">
+                      <span className="text-[7px] sm:text-[9px] font-black text-amber-200/80 tracking-[0.1em] sm:tracking-[0.2em] uppercase">Vedic Certified</span>
                     </div>
 
-                    {/* Avatar */}
-                    <div className="absolute bottom-4 left-1/2 -translate-x-1/2">
-                      <div className="relative inline-block">
-                        <div className="w-20 h-20 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center border-4 border-white/30 shadow-2xl">
-                          <Sparkles className="w-10 h-10 text-white" />
-                        </div>
-                        <div className="absolute -bottom-1 -right-1 w-8 h-8 bg-green-500 rounded-full flex items-center justify-center border-2 border-white">
-                          <span className="text-xs">✓</span>
-                        </div>
+                    <div className="absolute bottom-2 left-2 right-2 sm:bottom-5 sm:left-5 sm:right-5 translate-y-12 sm:translate-y-20 group-hover:translate-y-0 transition-transform duration-500">
+                      <div className="bg-black/40 backdrop-blur-md border border-white/10 p-1 sm:p-3 rounded-lg sm:rounded-xl flex items-center justify-between">
+                        <span className="text-[7px] sm:text-[9px] font-black text-white/90 uppercase tracking-widest">Master Energized</span>
+                        <Sparkles className="w-2.5 h-2.5 sm:w-3.5 sm:h-3.5 text-amber-400" />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="px-1 sm:px-3 pt-3 sm:pt-6 pb-2 sm:pb-4">
+                    <div className="flex items-center gap-1 sm:gap-1.5 mb-1 sm:mb-2.5">
+                      <div className="w-1 h-1 sm:w-1.5 sm:h-1.5 bg-amber-500 rounded-full" />
+                      <span className="text-[7px] sm:text-[9px] font-black text-amber-600 uppercase tracking-widest">Premium Selection</span>
+                    </div>
+                    <h4 className="text-sm sm:text-2xl font-black text-slate-900 mb-1 tracking-tight group-hover:text-amber-600 transition-colors line-clamp-1">
+                      {category.name}
+                    </h4>
+                    <p className="text-slate-500 text-[10px] sm:text-xs font-medium leading-normal sm:leading-relaxed mb-3 sm:mb-6 pr-1 line-clamp-2">
+                      Authentic spiritual tools meticulously chosen & activated for vastu alignment.
+                    </p>
+                    
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-1 bg-slate-50 px-2 py-1 rounded-md sm:rounded-lg group-hover:bg-amber-600 transition-all duration-300">
+                        <span className="text-[7px] sm:text-[9px] font-black text-slate-600 group-hover:text-white uppercase tracking-widest">View Collection</span>
+                        <ChevronRight className="w-2.5 h-2.5 sm:w-3.5 sm:h-3.5 text-slate-400 group-hover:text-white group-hover:translate-x-0.5 transition-all" />
                       </div>
                     </div>
                   </div>
                 </div>
+              );
+            })}
+          </div>
+        )}
 
-                {/* KIT CONTENT */}
-                <div className="p-6 space-y-4">
-                  <h4 className="text-2xl font-bold text-white group-hover:text-amber-300 transition-colors">
-                    {kit.name}
-                  </h4>
-                  <p className="text-amber-400 text-sm font-semibold">{kit.subtitle}</p>
+        {/* TRUST BADGE */}
+        <div className="max-w-4xl mx-auto mb-16">
+          <div className="bg-white border border-amber-200 rounded-3xl p-10 text-center backdrop-blur-sm shadow-xl">
+            <Award className="w-12 h-12 text-amber-600 mx-auto mb-4" />
 
-                  {/* ITEMS */}
-                  <p className="text-amber-300/80 text-sm font-semibold">Sacred Items Included:</p>
-                  <ul className="space-y-1">
-                    {kit.items.map((item, idx) => (
-                      <li
-                        key={idx}
-                        className="flex items-center gap-2 text-amber-100/80 text-sm"
-                      >
-                        <div className="w-1.5 h-1.5 bg-amber-400 rounded-full" />
-                        {item}
-                      </li>
-                    ))}
-                  </ul>
+            <h3 className="text-3xl font-bold text-slate-900">{t('guaranteeTitle')}</h3>
 
-                  {/* PRICE */}
-                  <div className="pt-4 space-y-3">
-                    <div className="flex items-baseline gap-2">
-                      <span className="text-3xl font-bold text-white">{kit.price}</span>
-                      <span className="text-amber-200/60 line-through text-sm">
-                        ₹{parseInt(kit.price.replace(/[₹,]/g, "")) * 1.5}
-                      </span>
-                    </div>
-
-                    <button className="w-full px-6 py-3 bg-gradient-to-r from-amber-500 to-orange-500 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2">
-                      Add to Cart
-                      <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))}
+            <p className="text-slate-700 max-w-md mx-auto mt-3 text-sm">
+              {t('guaranteeDesc')}
+            </p>
           </div>
         </div>
 
-        {/* ============================== */}
-        {/* INDIVIDUAL PRODUCTS */}
-        {/* ============================== */}
-
-        <div>
-          <h3 className="text-3xl md:text-4xl font-bold text-center text-white mb-4">
-            Individual <span className="text-amber-400">Sacred Remedies</span>
-          </h3>
-          <p className="text-center text-amber-200/70 mb-12 max-w-2xl mx-auto">
-            Each remedy comes with Adish's personal guidance video on proper placement and activation
-          </p>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-
-            {[
-              {
-                name: "Sri Yantra",
-                category: "Sacred Geometry",
-                desc: "Handcrafted copper Sri Yantra for prosperity and spiritual growth",
-                price: "₹3,499",
-                icon: "🔺",
-                video: true
-              },
-              {
-                name: "Crystal Pyramid",
-                category: "Energy Amplifier",
-                desc: "Natural quartz pyramid for Vastu correction and energy balance",
-                price: "₹2,499",
-                icon: "💎",
-                video: true
-              },
-              {
-                name: "Navagraha Set",
-                category: "Planetary Remedies",
-                desc:
-                  "Complete set of nine planetary gemstones with copper yantras",
-                price: "₹12,999",
-                icon: "🌟",
-                video: true
-              },
-              {
-                name: "Vastu Compass",
-                category: "Direction Tool",
-                desc: "Professional brass compass for accurate directional analysis",
-                price: "₹1,999",
-                icon: "🧭",
-                video: true
-              },
-              {
-                name: "Sacred Thread",
-                category: "Protection",
-                desc: "Blessed Kalava for continuous protection and positive energy",
-                price: "₹499",
-                icon: "🧵",
-                video: false
-              },
-              {
-                name: "Incense Collection",
-                category: "Purification",
-                desc: "Seven sacred incense varieties for space cleansing rituals",
-                price: "₹899",
-                icon: "🪔",
-                video: false
-              },
-              {
-                name: "Rudraksha Mala",
-                category: "Meditation Tool",
-                desc: "Authentic 108-bead rudraksha mala for meditation and mantras",
-                price: "₹4,999",
-                icon: "📿",
-                video: true
-              },
-              {
-                name: "Copper Kalash",
-                category: "Ritual Vessel",
-                desc: "Pure copper kalash for home pujas and water energization",
-                price: "₹2,799",
-                icon: "🏺",
-                video: true
-              }
-            ].map((product, i) => (
-              <div
-                key={i}
-                className="group relative bg-gradient-to-br from-white/5 to-white/10 rounded-xl overflow-hidden backdrop-blur-sm border border-white/10 hover:border-amber-400/50 transition-all duration-300 hover:scale-105 hover:shadow-xl hover:shadow-orange-500/20"
-              >
-                {/* PRODUCT IMAGE */}
-                <div className="relative h-48 bg-gradient-to-br from-amber-900 via-orange-900 to-red-900 flex items-center justify-center">
-                  <div className="text-6xl group-hover:scale-110 transition-transform">
-                    {product.icon}
-                  </div>
-
-                  {/* Video badge */}
-                  {product.video && (
-                    <div className="absolute top-3 right-3 z-20 px-2 py-1 bg-red-500 rounded-full flex items-center gap-1 shadow-lg">
-                      <div className="w-2 h-2 bg-white rounded-full animate-pulse" />
-                      <span className="text-white text-xs font-bold">VIDEO</span>
-                    </div>
-                  )}
-
-                  {/* Approved badge */}
-                  <div className="absolute bottom-3 left-3 right-3 px-2 py-1 bg-black/40 backdrop-blur-sm rounded-full border border-amber-400/30 flex items-center gap-1 justify-center">
-                    <Sparkles className="w-3 h-3 text-amber-400" />
-                    <span className="text-amber-300 text-xs font-semibold">
-                      Adish Approved
-                    </span>
-                  </div>
-
-                  {/* Glow */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                </div>
-
-                {/* PRODUCT CONTENT */}
-                <div className="p-4 space-y-3">
-                  <p className="text-amber-400/80 text-xs font-semibold uppercase tracking-wide">
-                    {product.category}
-                  </p>
-
-                  <h4 className="text-lg font-bold text-white group-hover:text-amber-300 transition-colors">
-                    {product.name}
-                  </h4>
-
-                  <p className="text-amber-200/70 text-sm leading-relaxed line-clamp-2">
-                    {product.desc}
-                  </p>
-
-                  <div className="pt-2 flex items-center justify-between">
-                    <span className="text-2xl font-bold text-white">{product.price}</span>
-
-                    <button className="px-4 py-2 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-white text-sm font-semibold rounded-lg shadow-md transition-all">
-                      Add
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* HOW TO USE VIDEOS */}
-        <div className="mt-20">
-          <div className="max-w-5xl mx-auto">
-            <div className="text-center mb-12">
-              <h3 className="text-3xl md:text-4xl font-bold text-white mb-4">
-                Learn to <span className="text-amber-400">Activate Your Remedies</span>
-              </h3>
-              <p className="text-xl text-amber-200/80">
-                Adish personally guides you through proper placement, consecration, and daily practices
-              </p>
-            </div>
-
-            <div className="grid md:grid-cols-3 gap-6">
-              {[
-                {
-                  title: "Proper Placement",
-                  desc:
-                    "Learn exact directional placement according to Vastu principles",
-                  icon: "🧭",
-                  duration: "5 min"
-                },
-                {
-                  title: "Sacred Activation",
-                  desc:
-                    "Step-by-step mantra and ritual process for energizing your remedy",
-                  icon: "🕉️",
-                  duration: "8 min"
-                },
-                {
-                  title: "Daily Practices",
-                  desc: "Simple daily rituals to maintain and amplify the energy",
-                  icon: "🙏",
-                  duration: "4 min"
-                }
-              ].map((guide, i) => (
-                <div
-                  key={i}
-                  className="group relative bg-gradient-to-br from-white/5 to-white/10 rounded-xl p-6 backdrop-blur-sm border border-white/10 hover:border-amber-400/30 transition-all hover:scale-105 cursor-pointer"
-                >
-                  <div className="text-5xl mb-4 group-hover:scale-110 transition-transform">
-                    {guide.icon}
-                  </div>
-
-                  <h4 className="text-xl font-bold text-white mb-2 group-hover:text-amber-300 transition-colors">
-                    {guide.title}
-                  </h4>
-
-                  <p className="text-amber-200/70 text-sm mb-4">{guide.desc}</p>
-
-                  <div className="flex items-center gap-2 text-amber-400 text-sm">
-                    <Clock className="w-4 h-4" />
-                    <span>{guide.duration} video</span>
-                  </div>
-
-                  <div className="absolute top-4 right-4 w-10 h-10 bg-amber-500/20 backdrop-blur-sm rounded-full flex items-center justify-center border border-amber-400/30 group-hover:bg-amber-500/40 transition-all">
-                    <div className="w-0 h-0 border-l-4 border-l-amber-400 border-t-3 border-t-transparent border-b-3 border-b-transparent ml-1" />
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* TRUST & AUTHENTICITY */}
-        <div className="mt-20 max-w-4xl mx-auto">
-          <div className="relative p-8 md:p-12 bg-gradient-to-br from-green-900/30 via-emerald-900/30 to-teal-900/30 rounded-3xl border-2 border-green-400/30 backdrop-blur-sm">
-
-            <div className="text-center space-y-6">
-              <div className="flex justify-center">
-                <div className="w-20 h-20 bg-gradient-to-br from-green-400 to-emerald-500 rounded-full flex items-center justify-center shadow-2xl shadow-green-500/50">
-                  <Award className="w-10 h-10 text-white" />
-                </div>
-              </div>
-
-              <h3 className="text-3xl md:text-4xl font-bold text-white">
-                100% Authenticity{" "}
-                <span className="text-green-400">Guaranteed</span>
-              </h3>
-
-              <div className="grid md:grid-cols-3 gap-8 pt-6">
-                {[
-                  {
-                    icon: "✓",
-                    title: "Verified Sources",
-                    desc: "Every item sourced from trusted artisans and authentic suppliers"
-                  },
-                  {
-                    icon: "🔐",
-                    title: "Quality Tested",
-                    desc: "Rigorous quality checks for purity, craftsmanship, and energy"
-                  },
-                  {
-                    icon: "🙏",
-                    title: "Blessed by Adish",
-                    desc: "Personal consecration and energization before shipping"
-                  }
-                ].map((trust, i) => (
-                  <div key={i} className="text-center space-y-2">
-                    <div className="text-4xl text-green-400 mb-3">{trust.icon}</div>
-                    <h4 className="text-lg font-bold text-white">{trust.title}</h4>
-                    <p className="text-green-200/70 text-sm">{trust.desc}</p>
-                  </div>
-                ))}
-              </div>
-
-              <div className="pt-8 border-t border-white/10">
-                <p className="text-green-200/80 text-lg italic">
-                  "I personally inspect and bless each remedy before it reaches you. 
-                  Your trust is sacred to me." — Adish
-                </p>
-              </div>
-            </div>
-
-            {/* Decorative Elements */}
-            <div className="absolute top-4 left-4 w-12 h-12 border-t-2 border-l-2 border-green-400 rounded-tl-lg" />
-            <div className="absolute top-4 right-4 w-12 h-12 border-t-2 border-r-2 border-green-400 rounded-tr-lg" />
-            <div className="absolute bottom-4 left-4 w-12 h-12 border-b-2 border-l-2 border-green-400 rounded-bl-lg" />
-            <div className="absolute bottom-4 right-4 w-12 h-12 border-b-2 border-r-2 border-green-400 rounded-br-lg" />
-          </div>
-        </div>
-
-        {/* FINAL CTA */}
-        <div className="mt-20 text-center space-y-6">
-          <h3 className="text-3xl md:text-4xl font-bold text-white">
-            Begin Your Sacred Journey Today
-          </h3>
-
-          <p className="text-xl text-amber-200/80 max-w-2xl mx-auto">
-            Every remedy comes with lifetime guidance and support from Adish's team
-          </p>
-
-          <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
-            <button className="group px-10 py-4 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-white font-bold text-lg rounded-lg shadow-2xl shadow-orange-500/50 transition-all transform hover:scale-105 flex items-center justify-center gap-2">
-              Explore All Sacred Remedies
-              <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-            </button>
-
-            <button className="px-10 py-4 bg-white/10 hover:bg-white/20 text-white font-bold text-lg rounded-lg backdrop-blur-sm border-2 border-white/20 hover:border-amber-400/50 transition-all transform hover:scale-105">
-              Speak to Our Team
-            </button>
-          </div>
+        {/* CTA */}
+        <div className="text-center pb-8 mt-4">
+          <button 
+            onClick={() => router.push('/?service=remedies&msg=Global%20Sacred%20Remedy%20Consultation#consultation-form')}
+            className="px-12 py-5 bg-gradient-to-r from-amber-500 to-orange-600 text-white font-black text-sm uppercase tracking-[0.2em] rounded-2xl shadow-2xl shadow-amber-500/20 hover:scale-105 active:scale-95 transition-all flex items-center gap-3 mx-auto group"
+          >
+            {t('cta')}
+            <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+          </button>
         </div>
 
       </div>

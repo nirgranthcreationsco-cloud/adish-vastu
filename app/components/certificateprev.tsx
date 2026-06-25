@@ -32,7 +32,7 @@ export default function CertificatePreview() {
         </h1>
 
         <p className="text-lg text-amber-700 tracking-wide mb-6">
-          Awarded with blessings & recognition from <span className="font-semibold">Master Adish</span>
+          Awarded with blessings & recognition from <span className="font-semibold">Master Aadish Jain</span>
         </p>
 
         {/* Divider */}
@@ -55,7 +55,7 @@ export default function CertificatePreview() {
 
         <p className="text-amber-700 max-w-2xl mx-auto mt-6 leading-relaxed text-lg">
           under the personal guidance, wisdom, and spiritual mentorship of  
-          <span className="font-semibold text-amber-900"> Master Adish</span>,  
+          <span className="font-semibold text-amber-900"> Master Aadish Jain</span>,  
           demonstrating commitment, discipline, and mastery of divine knowledge.
         </p>
 
@@ -72,7 +72,7 @@ export default function CertificatePreview() {
 
           {/* Signature */}
           <div>
-            <p className="text-4xl font-serif italic text-amber-900">Adish</p>
+            <p className="text-4xl font-serif italic text-amber-900">Aadish Jain</p>
             <p className="text-sm text-amber-700">Master & Mentor</p>
           </div>
 

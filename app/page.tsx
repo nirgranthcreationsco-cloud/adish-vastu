@@ -3,6 +3,7 @@
 import AuthenticityGuaranteeSection from "@/app/components/authenticity";
 import CoursesSection from "@/app/components/course";
 import FinalCTASection from "@/app/components/final";
+import FloatingCart from "@/app/components/floatingcart";
 import HeroSection from "@/app/components/herosection";
 import RemediesSection from "@/app/components/remedies";
 import ServicesSection from "@/app/components/services";
@@ -11,7 +12,7 @@ import WhyOneMasterSection from "@/app/components/whyus";
 
 export default function Page() {
   return (
-    <main className="bg-black">
+    <main className="bg-orange-50 pt-8">
       <HeroSection />
       <WhyOneMasterSection />
       <ServicesSection />
@@ -20,6 +21,7 @@ export default function Page() {
       <AuthenticityGuaranteeSection />
       <TransformationStories />
       <FinalCTASection />
+      <FloatingCart />
     </main>
   );
 }
