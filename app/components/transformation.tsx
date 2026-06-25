@@ -25,7 +25,7 @@ export default function TransformationStories() {
     {
       name: "Rajesh Patel",
       location: "Ahmedabad",
-      img: "/profile1.png",
+      img: "/profile.png",
       title: "Business Reborn",
       problem: "Heavy losses, clients leaving, no stability.",
       solution: "Office layout correction + prosperity activation.",
@@ -91,6 +91,7 @@ export default function TransformationStories() {
                     src={s.img}
                     alt={s.name}
                     fill
+                    sizes="(max-width: 768px) 100vw, 500px"
                     className="object-cover"
                   />
                 </div>
