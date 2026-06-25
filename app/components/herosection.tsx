@@ -177,20 +177,10 @@ export default function HeroSection() {
             <div className="relative w-[260px] h-[260px] md:w-[420px] md:h-[420px] rounded-full overflow-hidden border-4 border-amber-400/40 shadow-2xl shadow-amber-500/50 hover:scale-105 transition-transform duration-700">
               <Image 
                 src="/profile.png" 
-                alt="Aadish Jain" 
+                alt="Jain Vastu Solutions" 
                 fill
                 className="object-cover"
                 priority
-              />
-            </div>
-
-            {/* Floating Sacred Element */}
-            <div className="absolute -bottom-10 -right-10 w-32 h-32 md:w-48 md:h-48 opacity-80 animate-float pointer-events-none">
-              <Image 
-                src="/vastu_elements.png" 
-                alt="Sacred Elements" 
-                fill
-                className="object-contain"
               />
             </div>
           </div>
