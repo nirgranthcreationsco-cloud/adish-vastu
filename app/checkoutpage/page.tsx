@@ -199,7 +199,7 @@ export default function CheckoutPage() {
       key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID, // Enter the Key ID generated from the Dashboard
       amount: orderData.amount, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
       currency: orderData.currency,
-      name: "Vastu Academy",
+      name: "Jain Vastu Solutions",
       description: "Sacred Items Checkout",
       order_id: orderData.order_id,
       handler: async function (response: any) {

@@ -192,7 +192,7 @@ export default function ProtectedVideoPlayer({
           {/* Watermark */}
           <div className="absolute bottom-4 left-4 z-20 px-3 py-1.5 bg-black/60 rounded-lg text-white text-xs flex items-center gap-2">
             <Lock className="w-3 h-3" />
-            <span>Protected by Vastu Academy</span>
+            <span>Protected by Jain Vastu Solutions</span>
           </div>
         </div>
       )}
