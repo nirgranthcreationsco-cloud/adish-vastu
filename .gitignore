@@ -39,6 +39,7 @@ google-service-account.json
 !package.json
 !package-lock.json
 !tsconfig.json
+!messages/*.json
 
 # vercel
 .vercel
