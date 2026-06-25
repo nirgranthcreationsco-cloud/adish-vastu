@@ -46,36 +46,38 @@ export default function HeroSection() {
         <div className="absolute inset-0 bg-gradient-to-br from-orange-100 via-amber-50 to-orange-100 z-10" />
 
         {/* Rotating Mandala */}
-        <div className="absolute inset-0 flex items-center justify-center opacity-25 -z-0">
-          <div className="w-[480px] h-[480px] md:w-[680px] md:h-[680px] animate-spin-slower">
-            <svg viewBox="0 0 200 200" className="w-full h-full">
-              <defs>
-                <radialGradient id="mandalaHero">
-                  <stop offset="0%" stopColor="#fbbf24" stopOpacity="0.9" />
-                  <stop offset="100%" stopColor="#f97316" stopOpacity="0.2" />
-                </radialGradient>
-              </defs>
+        {isVisible && (
+          <div className="absolute inset-0 flex items-center justify-center opacity-25 -z-0">
+            <div className="w-[480px] h-[480px] md:w-[680px] md:h-[680px] animate-spin-slower">
+              <svg viewBox="0 0 200 200" className="w-full h-full">
+                <defs>
+                  <radialGradient id="mandalaHero">
+                    <stop offset="0%" stopColor="#fbbf24" stopOpacity="0.9" />
+                    <stop offset="100%" stopColor="#f97316" stopOpacity="0.2" />
+                  </radialGradient>
+                </defs>
 
-              {/* Rings */}
-              <circle cx="100" cy="100" r="85" fill="none" stroke="url(#mandalaHero)" strokeWidth="1.2" />
-              <circle cx="100" cy="100" r="65" fill="none" stroke="url(#mandalaHero)" strokeWidth="1" />
-              <circle cx="100" cy="100" r="45" fill="none" stroke="url(#mandalaHero)" strokeWidth="0.8" />
+                {/* Rings */}
+                <circle cx="100" cy="100" r="85" fill="none" stroke="url(#mandalaHero)" strokeWidth="1.2" />
+                <circle cx="100" cy="100" r="65" fill="none" stroke="url(#mandalaHero)" strokeWidth="1" />
+                <circle cx="100" cy="100" r="45" fill="none" stroke="url(#mandalaHero)" strokeWidth="0.8" />
 
-              {/* Lines */}
-              {[...Array(24)].map((_, i) => (
-                <line
-                  key={i}
-                  x1="100"
-                  y1="100"
-                  x2={100 + 85 * Math.cos((i * Math.PI) / 12)}
-                  y2={100 + 85 * Math.sin((i * Math.PI) / 12)}
-                  stroke="url(#mandalaHero)"
-                  strokeWidth="0.8"
-                />
-              ))}
-            </svg>
+                {/* Lines */}
+                {[...Array(24)].map((_, i) => (
+                  <line
+                    key={i}
+                    x1="100"
+                    y1="100"
+                    x2={100 + 85 * Math.cos((i * Math.PI) / 12)}
+                    y2={100 + 85 * Math.sin((i * Math.PI) / 12)}
+                    stroke="url(#mandalaHero)"
+                    strokeWidth="0.8"
+                  />
+                ))}
+              </svg>
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Floating particles */}
         {isVisible && [...Array(20)].map((_, i) => (
@@ -179,10 +181,38 @@ export default function HeroSection() {
                 src="/profile.png" 
                 alt="Jain Vastu Solutions" 
                 fill
+                sizes="(max-width: 768px) 260px, 420px"
                 className="object-cover"
                 priority
               />
             </div>
+
+            {/* Floating Glass Badges */}
+            {isVisible && (
+              <>
+                {/* Top Left Badge */}
+                <div className="absolute -top-4 -left-4 md:-top-8 md:-left-8 z-30 px-4 py-2.5 bg-white/90 backdrop-blur-md border border-amber-200 rounded-2xl shadow-xl hover:scale-105 transition-all duration-300 flex items-center gap-2 animate-float">
+                  <div className="w-8 h-8 rounded-xl bg-amber-100 flex items-center justify-center text-amber-700">
+                    <Sparkles className="w-4 h-4 animate-pulse" />
+                  </div>
+                  <div className="text-left">
+                    <p className="text-[10px] uppercase tracking-wider text-slate-500 font-bold">Approach</p>
+                    <p className="text-xs font-black text-slate-800">100% Scientific</p>
+                  </div>
+                </div>
+
+                {/* Bottom Right Badge */}
+                <div className="absolute -bottom-4 -right-4 md:-bottom-8 md:-right-8 z-30 px-4 py-2.5 bg-white/90 backdrop-blur-md border border-amber-200 rounded-2xl shadow-xl hover:scale-105 transition-all duration-300 flex items-center gap-2 animate-float" style={{ animationDelay: '2s' }}>
+                  <div className="w-8 h-8 rounded-xl bg-amber-100 flex items-center justify-center text-amber-700">
+                    <Award className="w-4 h-4" />
+                  </div>
+                  <div className="text-left">
+                    <p className="text-[10px] uppercase tracking-wider text-slate-500 font-bold">Remedies</p>
+                    <p className="text-xs font-black text-slate-800">Personally Energized</p>
+                  </div>
+                </div>
+              </>
+            )}
           </div>
         </div>
       </div>
