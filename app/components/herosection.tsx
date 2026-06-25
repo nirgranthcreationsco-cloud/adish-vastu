@@ -78,7 +78,7 @@ export default function HeroSection() {
         </div>
 
         {/* Floating particles */}
-        {[...Array(20)].map((_, i) => (
+        {isVisible && [...Array(20)].map((_, i) => (
           <div
             key={i}
             className="absolute w-1 h-1 bg-amber-400 rounded-full animate-float"
