@@ -2,6 +2,8 @@
 
 import { NextIntlClientProvider } from 'next-intl';
 import { ReactNode, createContext, useContext, useEffect, useState } from 'react';
+import enMessages from '@/messages/en.json';
+import hiMessages from '@/messages/hi.json';
 
 interface LocaleContextType {
   locale: string;
@@ -18,7 +20,7 @@ export function useLocale() {
 
 export default function LocaleProvider({ children }: { children: ReactNode }) {
   const [locale, setLocale] = useState('en');
-  const [messages, setMessages] = useState<any>(null);
+  const [messages, setMessages] = useState<any>(enMessages); // Default to statically imported English
 
   useEffect(() => {
     // Load locale from localStorage
@@ -27,12 +29,11 @@ export default function LocaleProvider({ children }: { children: ReactNode }) {
     loadMessages(savedLocale);
   }, []);
 
-  const loadMessages = async (loc: string) => {
-    try {
-      const msgs = await import(`@/messages/${loc}.json`);
-      setMessages(msgs.default);
-    } catch (error) {
-      console.error('Failed to load messages:', error);
+  const loadMessages = (loc: string) => {
+    if (loc === 'hi') {
+      setMessages(hiMessages);
+    } else {
+      setMessages(enMessages);
     }
   };
 
@@ -41,18 +42,6 @@ export default function LocaleProvider({ children }: { children: ReactNode }) {
     localStorage.setItem('locale', newLocale);
     loadMessages(newLocale);
   };
-
-  // Show loading state until messages are loaded
-  if (!messages) {
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-orange-50">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-600 mx-auto mb-4"></div>
-          <p className="text-amber-800 font-medium">Loading...</p>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <LocaleContext.Provider value={{ locale, switchLocale }}>

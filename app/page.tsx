@@ -9,6 +9,7 @@ import RemediesSection from "@/app/components/remedies";
 import ServicesSection from "@/app/components/services";
 import TransformationStories from "@/app/components/transformation";
 import WhyOneMasterSection from "@/app/components/whyus";
+import { Suspense } from "react";
 
 export default function Page() {
   return (
@@ -20,8 +21,11 @@ export default function Page() {
       <RemediesSection />
       <AuthenticityGuaranteeSection />
       <TransformationStories />
-      <FinalCTASection />
+      <Suspense fallback={null}>
+        <FinalCTASection />
+      </Suspense>
       <FloatingCart />
     </main>
   );
 }
+
