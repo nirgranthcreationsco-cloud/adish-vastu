@@ -112,7 +112,7 @@ export default function RemediesSection() {
   };
 
   return (
-    <section className="relative py-16 md:py-24 overflow-hidden bg-gradient-to-b from-orange-100 via-amber-50 to-orange-100">
+    <section id="remedies" className="relative py-16 md:py-24 overflow-hidden bg-gradient-to-b from-orange-100 via-amber-50 to-orange-100 scroll-mt-12">
       
       {/* Subtle Pattern */}
       <div className="absolute inset-0 opacity-[0.03]">

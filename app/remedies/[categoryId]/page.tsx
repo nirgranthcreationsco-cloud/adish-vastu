@@ -55,6 +55,7 @@ export default function CategoryPage() {
     enquiryType: "price_request",
   });
   const [isEnergyModalOpen, setIsEnergyModalOpen] = useState(false);
+  const [allCategories, setAllCategories] = useState<{ id: string; name: string }[]>([]);
 
   const categoryId = params.categoryId as string;
   const categoryName = decodeURIComponent(categoryId).replace(/-/g, ' ');
@@ -75,6 +76,12 @@ export default function CategoryPage() {
       if (!mainData.success) {
         throw new Error(mainData.error);
       }
+
+      // Store all category folders for quick switching
+      const catFolders = (mainData.items || [])
+        .filter((item: DriveItem) => item.mimeType === 'application/vnd.google-apps.folder')
+        .map((item: DriveItem) => ({ id: item.id, name: item.name }));
+      setAllCategories(catFolders);
 
       // Find the matching category folder
       const categoryFolder = mainData.items.find(
@@ -296,38 +303,63 @@ export default function CategoryPage() {
       <div className="fixed inset-0 pointer-events-none opacity-5 scroll-smooth">
         <Image src="/sacred_remedies.png" alt="background" fill className="object-cover" />
       </div>
-      {/* Header */}
-      <div className="bg-white/50 backdrop-blur-sm border-b border-amber-200 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4">
+      {/* Header with Back Anchor and Category Switcher */}
+      <div className="bg-white/80 backdrop-blur-md border-b border-amber-200 sticky top-0 z-50 shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <button
-            onClick={() => router.push('/')}
-            className="flex items-center gap-2 text-slate-700 hover:text-amber-600 transition-colors"
+            onClick={() => router.push('/#remedies')}
+            className="flex items-center gap-2 text-slate-700 hover:text-amber-600 font-bold transition-colors w-fit group"
           >
-            <ArrowLeft className="w-5 h-5" />
-            <span className="font-medium">Back to Remedies</span>
+            <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
+            <span className="text-sm">Back to Remedies Section</span>
           </button>
+
+          {/* Quick Category Switcher Pills */}
+          {allCategories.length > 0 && (
+            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0 scrollbar-none">
+              <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest mr-1 hidden md:inline">
+                Categories:
+              </span>
+              {allCategories.map((cat) => {
+                const isCurrent = cat.name.toLowerCase() === categoryName.toLowerCase();
+                return (
+                  <button
+                    key={cat.id}
+                    onClick={() => router.push(`/remedies/${encodeURIComponent(cat.name.replace(/\s+/g, '-'))}`)}
+                    className={`px-3 py-1.5 rounded-full text-xs font-black tracking-tight whitespace-nowrap transition-all border ${
+                      isCurrent
+                        ? "bg-amber-500 text-slate-950 border-amber-400 shadow-sm font-black"
+                        : "bg-amber-50/60 text-slate-700 hover:bg-amber-100/80 border-amber-200/80"
+                    }`}
+                  >
+                    {cat.name}
+                  </button>
+                );
+              })}
+            </div>
+          )}
         </div>
       </div>
 
       {/* Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
         {/* Category Header */}
-        <div className="text-center mb-10">
-          <h1 className="text-4xl md:text-5xl font-bold text-slate-900 mb-4 capitalize">
+        <div className="text-center mb-8 sm:mb-10">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-slate-900 mb-3 capitalize">
             {categoryName}
           </h1>
-          <p className="text-slate-700 text-lg max-w-2xl mx-auto mb-6">
+          <p className="text-slate-700 text-sm sm:text-lg max-w-2xl mx-auto mb-4">
             Discover our curated collection of {categoryName.toLowerCase()} products
           </p>
-          <div className="inline-block px-4 py-2 bg-amber-100 border border-amber-300 rounded-full">
-            <span className="text-amber-900 font-semibold">
+          <div className="inline-block px-4 py-1.5 bg-amber-100 border border-amber-300 rounded-full">
+            <span className="text-amber-900 text-xs sm:text-sm font-bold">
               {filteredProducts.length} Products Available
             </span>
           </div>
         </div>
 
         {/* Real-time Search Bar */}
-        <div className="max-w-md mx-auto mb-12 relative group">
+        <div className="max-w-md mx-auto mb-10 sm:mb-12 relative group">
           <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
             <Search className="h-5 w-5 text-amber-600 transition-colors group-focus-within:text-amber-500" />
           </div>
@@ -336,7 +368,7 @@ export default function CategoryPage() {
             placeholder={`Search in ${categoryName.toLowerCase()}...`}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="block w-full pl-12 pr-4 py-4 bg-amber-50/30 border-2 border-amber-200/80 rounded-2xl text-slate-800 font-bold placeholder:text-slate-400 outline-none focus:border-amber-500 focus:bg-white focus:shadow-[0_15px_30px_-10px_rgba(245,158,11,0.2)] transition-all duration-300 shadow-sm"
+            className="block w-full pl-12 pr-4 py-3.5 bg-amber-50/30 border-2 border-amber-200/80 rounded-2xl text-slate-800 font-bold placeholder:text-slate-400 outline-none focus:border-amber-500 focus:bg-white focus:shadow-[0_15px_30px_-10px_rgba(245,158,11,0.2)] transition-all duration-300 shadow-sm text-sm sm:text-base"
           />
         </div>
 
