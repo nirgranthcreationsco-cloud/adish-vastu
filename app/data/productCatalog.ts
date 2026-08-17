@@ -4,12 +4,23 @@ export interface ProductVariant {
   b2c: string | number | null;
 }
 
+export interface ProductEducationalInfo {
+  whatIsIt: string;
+  whyUsed: string;
+  suitableFor: string;
+  howUsed: string;
+  crossSellIds?: string[];
+}
+
+export type ProductStatus = 'DIRECT_PURCHASE' | 'ENQUIRE_PRICE' | 'VARIABLE_PRICE' | 'CONSULTATION_REQUIRED';
+
 export interface CatalogProduct {
   name: string;
   category: string;
   b2b: string | number | null;
   b2c: string | number | null;
   variants: ProductVariant[];
+  info?: ProductEducationalInfo;
 }
 
 export const productCatalog: CatalogProduct[] = [
@@ -1418,4 +1429,106 @@ export function matchDriveItemToCatalog(fileName: string): { product: CatalogPro
   }
 
   return { product: null, variant: null };
+}
+
+// Technical tools that strictly require expert consultation before installation
+const CONSULTATION_KEYWORDS = [
+  'lecher antenna',
+  'dowsing rod',
+  'geopathic',
+  'bram nabhi',
+  'toilet pacifier',
+  'fire balancer',
+  'entry blocker',
+  'shakti chakra',
+  'dowsing board',
+  'liquid mercury',
+  'mercury / parad pyramid'
+];
+
+export function getProductStatus(product: CatalogProduct | null | undefined, selectedOption?: string): ProductStatus {
+  if (!product) return 'ENQUIRE_PRICE';
+  
+  const nameLower = product.name.toLowerCase();
+  
+  // 1. Consultation required for high-precision or complex energetic diagnostic tools
+  if (CONSULTATION_KEYWORDS.some(k => nameLower.includes(k))) {
+    return 'CONSULTATION_REQUIRED';
+  }
+  
+  // 2. Products with multiple variants
+  if (product.variants && product.variants.length > 0) {
+    if (selectedOption) {
+      const v = product.variants.find(item => item.option.toLowerCase() === selectedOption.toLowerCase());
+      if (v && v.b2c !== null && v.b2c !== undefined && v.b2c !== '' && v.b2c !== 0) {
+        return 'DIRECT_PURCHASE';
+      }
+      return 'ENQUIRE_PRICE';
+    }
+    return 'VARIABLE_PRICE';
+  }
+  
+  // 3. Single product with price check
+  if (product.b2c !== null && product.b2c !== undefined && product.b2c !== '' && product.b2c !== 0) {
+    return 'DIRECT_PURCHASE';
+  }
+  
+  return 'ENQUIRE_PRICE';
+}
+
+export function getEducationalInfo(productName: string, category: string): ProductEducationalInfo {
+  const norm = productName.toLowerCase();
+  
+  if (norm.includes('pyramid')) {
+    return {
+      whatIsIt: "Sacred geometric energy harmonizer engineered according to classical Vedic Vastu proportions.",
+      whyUsed: "Used to amplify directional positive vibrations, neutralize energy faults, and balance bio-resonance in residential and commercial premises.",
+      suitableFor: "Homes, apartments, offices, and plots with directional cuts, extended corners, or energetic imbalances.",
+      howUsed: "Placed in the designated directional zone (such as North-East for clarity or South-East for fire balance) after orientation alignment."
+    };
+  }
+  
+  if (norm.includes('swastika') || norm.includes('swastik') || norm.includes('nandavarta')) {
+    return {
+      whatIsIt: "Ancient Vedic auspicious energy emblem fabricated in resonant metals like pure copper, tridhatu, and silver.",
+      whyUsed: "Creates an energetic shield against negative environmental influences while welcoming abundance, peace, and auspicious vibrations.",
+      suitableFor: "Main entrances, pooja rooms, thresholds, safes, cash counters, and study spaces.",
+      howUsed: "Affixed at eye-level on the main entrance threshold or consecrated in the spiritual corner facing East or North."
+    };
+  }
+  
+  if (norm.includes('helix')) {
+    return {
+      whatIsIt: "Spiral metal energy vortex device designed to correct directional defects and activate planetary energies.",
+      whyUsed: "Balances gravitational and magnetic field distortions caused by incorrect room placements or structural defects.",
+      suitableFor: "Properties with missing zones, misplaced staircases, toilets in sensitive directions, or low-energy zones.",
+      howUsed: "Installed near the floor or concealed within the wall/flooring at the specific elemental corner matching the metal."
+    };
+  }
+  
+  if (norm.includes('rod') || norm.includes('antenna') || norm.includes('dowsing')) {
+    return {
+      whatIsIt: "Precision energetic diagnosis and grounding instrument for earth radiation and sub-soil grid line detection.",
+      whyUsed: "Identifies and neutralizes harmful geopathic stress lines, underground water veins, and grid intersections that cause persistent disturbances.",
+      suitableFor: "Spaces with chronic unexplained sleep issues, heaviness, or ongoing energetic resistance.",
+      howUsed: "Must be calibrated and installed under expert guidance following energetic mapping of the premises."
+    };
+  }
+  
+  if (norm.includes('stone') || norm.includes('tumble') || norm.includes('rough') || norm.includes('tree') || norm.includes('pyrite') || norm.includes('citrine') || norm.includes('amethyst') || norm.includes('selenite') || norm.includes('quartz')) {
+    return {
+      whatIsIt: "Natural, high-grade crystalline mineral energized for vibrational elevation and space purification.",
+      whyUsed: "Absorbs ambient disharmony, enhances wealth frequency, mental tranquility, and spiritual aura.",
+      suitableFor: "Workstations, living areas, bedroom nightstands, meditation rooms, and wealth corners.",
+      howUsed: "Keep cleansed in natural daylight and place in the relevant Vastu quadrant (e.g. Citrine/Pyrite in North/South-East, Amethyst in West)."
+    };
+  }
+
+  // General fallback
+  return {
+    whatIsIt: `Authentic Vastu remedy curated for energetic space alignment and prosperity in ${category}.`,
+    whyUsed: "Assists in transmuting stagnant or negative environmental energies into harmonious life-force frequencies.",
+    suitableFor: "Residential homes, commercial establishments, and renovation projects seeking Vedic energetic harmony.",
+    howUsed: "Place in the recommended directional zone following personal space consultation."
+  };
 }

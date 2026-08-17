@@ -1,12 +1,15 @@
 "use client";
 
-import { ArrowLeft, Loader2, Package, ShoppingCart, Search, Sparkles } from "lucide-react";
+import { ArrowLeft, Loader2, Package, ShoppingCart, Search, Sparkles, HelpCircle, MessageCircle, Info, ChevronRight, Compass, ShieldCheck } from "lucide-react";
 import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import FloatingCart from "../../components/floatingcart";
 import { useCart } from "../../context/cartcontext";
-import { productCatalog, CatalogProduct, matchDriveItemToCatalog } from "@/app/data/productCatalog";
+import { productCatalog, CatalogProduct, matchDriveItemToCatalog, getProductStatus, ProductStatus } from "@/app/data/productCatalog";
+import ProductEnquiryModal from "../../components/productenquirymodal";
+import ProductDetailModal from "../../components/productdetailmodal";
+import HomeEnergyScoreModal from "../../components/homeenergyscoremodal";
 
 interface DriveItem {
   id: string;
@@ -36,6 +39,22 @@ export default function CategoryPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedVariants, setSelectedVariants] = useState<Record<string, string>>({});
   const [imageErrors, setImageErrors] = useState<Record<string, boolean>>({});
+
+  // Modals state
+  const [detailModalProduct, setDetailModalProduct] = useState<Product | null>(null);
+  const [enquiryModalData, setEnquiryModalData] = useState<{
+    isOpen: boolean;
+    productName: string;
+    categoryName: string;
+    selectedVariant?: string;
+    enquiryType: "price_request" | "consultation_request";
+  }>({
+    isOpen: false,
+    productName: "",
+    categoryName: "",
+    enquiryType: "price_request",
+  });
+  const [isEnergyModalOpen, setIsEnergyModalOpen] = useState(false);
 
   const categoryId = params.categoryId as string;
   const categoryName = decodeURIComponent(categoryId).replace(/-/g, ' ');
@@ -329,104 +348,298 @@ export default function CategoryPage() {
           </div>
         ) : (
           <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-6">
-            {filteredProducts.map((product) => (
-              <div
-                key={product.id}
-                className="bg-white rounded-xl sm:rounded-2xl border border-amber-200 hover:border-amber-400 hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 overflow-hidden group flex flex-col h-full"
-              >
-                {/* Product Image & Elegant Placeholder Fallback */}
-                <div className="relative h-36 sm:h-64 bg-gradient-to-br from-amber-950 via-slate-900 to-amber-900 overflow-hidden flex-shrink-0 flex items-center justify-center">
-                  {!imageErrors[product.id] && product.image ? (
-                    <Image
-                      src={product.image}
-                      alt={product.name}
-                      fill
-                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
-                      className="object-cover group-hover:scale-110 transition-transform duration-500"
-                      onError={() => setImageErrors((prev) => ({ ...prev, [product.id]: true }))}
-                    />
-                  ) : (
-                    <div className="relative w-full h-full flex flex-col items-center justify-center p-4 text-center overflow-hidden">
-                      {/* Ambient Golden Radial Glow */}
-                      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(245,158,11,0.22)_0%,transparent_70%)] pointer-events-none" />
-                      
-                      {/* Sacred Geometric Line Art SVG */}
-                      <svg className="w-16 h-16 sm:w-24 sm:h-24 text-amber-400/70 mb-2 group-hover:scale-110 group-hover:rotate-12 transition-transform duration-700 animate-pulse" viewBox="0 0 100 100" fill="none" stroke="currentColor">
-                        <polygon points="50,10 90,90 10,90" strokeWidth="1.5" className="text-amber-500" />
-                        <polygon points="50,90 90,10 10,10" strokeWidth="1" strokeDasharray="3 3" className="text-amber-400/50" />
-                        <circle cx="50" cy="50" r="28" strokeWidth="1.2" className="text-amber-300" />
-                        <circle cx="50" cy="50" r="14" strokeWidth="1" className="text-amber-400" />
-                        <circle cx="50" cy="50" r="4" fill="currentColor" className="text-amber-400" />
-                      </svg>
+            {filteredProducts.map((product) => {
+              const currentVariant = selectedVariants[product.id];
+              const status: ProductStatus = getProductStatus(product.catalogItem, currentVariant);
+              const priceText = formatPrice(product);
+              const isPriced = status === "DIRECT_PURCHASE";
 
-                      {/* Professional Sacred Badge */}
-                      <div className="flex items-center gap-1.5 px-2.5 py-1 bg-amber-500/10 border border-amber-400/30 rounded-full backdrop-blur-md">
-                        <Sparkles className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-amber-400" />
-                        <span className="text-[8px] sm:text-[10px] font-black text-amber-200 uppercase tracking-widest">
-                          Authentic Vedic Remedy
-                        </span>
+              return (
+                <div
+                  key={product.id}
+                  className="bg-white rounded-2xl border border-amber-200/90 hover:border-amber-400 hover:shadow-2xl hover:scale-[1.015] transition-all duration-300 overflow-hidden group flex flex-col h-full relative"
+                >
+                  {/* Product Image & Elegant Placeholder Fallback */}
+                  <div 
+                    onClick={() => setDetailModalProduct(product)}
+                    className="relative h-40 sm:h-64 bg-gradient-to-br from-amber-950 via-slate-900 to-amber-900 overflow-hidden flex-shrink-0 flex items-center justify-center cursor-pointer"
+                  >
+                    {!imageErrors[product.id] && product.image ? (
+                      <Image
+                        src={product.image}
+                        alt={product.name}
+                        fill
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
+                        className="object-cover group-hover:scale-110 transition-transform duration-500"
+                        onError={() => setImageErrors((prev) => ({ ...prev, [product.id]: true }))}
+                      />
+                    ) : (
+                      <div className="relative w-full h-full flex flex-col items-center justify-center p-4 text-center overflow-hidden">
+                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(245,158,11,0.22)_0%,transparent_70%)] pointer-events-none" />
+                        <svg className="w-16 h-16 sm:w-24 sm:h-24 text-amber-400/70 mb-2 group-hover:scale-110 group-hover:rotate-12 transition-transform duration-700 animate-pulse" viewBox="0 0 100 100" fill="none" stroke="currentColor">
+                          <polygon points="50,10 90,90 10,90" strokeWidth="1.5" className="text-amber-500" />
+                          <polygon points="50,90 90,10 10,10" strokeWidth="1" strokeDasharray="3 3" className="text-amber-400/50" />
+                          <circle cx="50" cy="50" r="28" strokeWidth="1.2" className="text-amber-300" />
+                          <circle cx="50" cy="50" r="14" strokeWidth="1" className="text-amber-400" />
+                          <circle cx="50" cy="50" r="4" fill="currentColor" className="text-amber-400" />
+                        </svg>
+                        <div className="flex items-center gap-1.5 px-2.5 py-1 bg-amber-500/10 border border-amber-400/30 rounded-full backdrop-blur-md">
+                          <Sparkles className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-amber-400" />
+                          <span className="text-[8px] sm:text-[10px] font-black text-amber-200 uppercase tracking-widest">
+                            Authentic Vedic Remedy
+                          </span>
+                        </div>
                       </div>
-                    </div>
-                  )}
+                    )}
 
-                  <div className="absolute top-2 right-2 sm:top-3 sm:right-3 px-1.5 py-0.5 sm:px-3 sm:py-1 bg-gradient-to-r from-amber-500 to-orange-500 text-white text-[8px] sm:text-xs font-bold rounded-full z-10 shadow-md">
-                    GENUINE
-                  </div>
-                </div>
-
-                {/* Product Info */}
-                <div className="p-3 sm:p-5 flex flex-col flex-1">
-                  <p className="text-amber-700 text-[9px] sm:text-sm font-medium uppercase tracking-wide">
-                    {product.category}
-                  </p>
-                  <h3 className="text-xs sm:text-lg font-bold text-slate-900 mt-1 sm:mt-2 line-clamp-2 leading-tight">
-                    {product.name}
-                  </h3>
-
-                  {product.catalogItem && product.catalogItem.variants.length > 0 && (
-                    <div className="mt-2 text-left">
-                      <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">
-                        Select Option
-                      </label>
-                      <select
-                        value={selectedVariants[product.id] || ""}
-                        onChange={(e) => setSelectedVariants(prev => ({ ...prev, [product.id]: e.target.value }))}
-                        className="w-full px-2 py-1.5 bg-amber-50/50 border border-amber-200 rounded-lg text-slate-800 text-xs font-bold outline-none focus:border-amber-500 transition-colors"
-                      >
-                        {product.catalogItem.variants.map((v: any) => (
-                          <option key={v.option} value={v.option}>
-                            {v.option}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                  )}
-
-                  {/* Price and Button pushed to bottom */}
-                  <div className="mt-auto pt-3 sm:pt-4">
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm sm:text-2xl font-bold text-amber-600">
-                        {formatPrice(product)}
-                      </span>
+                    {/* Status Badge */}
+                    <div className="absolute top-2 right-2 sm:top-3 sm:right-3 px-2 py-0.5 sm:px-3 sm:py-1 bg-gradient-to-r from-amber-500 to-orange-500 text-white text-[8px] sm:text-xs font-black rounded-full z-10 shadow-md">
+                      {status === "CONSULTATION_REQUIRED" ? "GUIDANCE" : isPriced ? "IN STOCK" : "CUSTOM"}
                     </div>
 
-                    <button
-                      onClick={() => handleAddToCart(product)}
-                      className="w-full mt-2 sm:mt-4 px-2 sm:px-4 py-2 sm:py-3 bg-gradient-to-r from-amber-500 to-orange-500 text-white font-bold rounded-lg sm:rounded-xl hover:scale-105 hover:shadow-lg transition-all duration-300 flex items-center justify-center gap-1.5 sm:gap-2 text-[10px] sm:text-base"
+                    {/* Quick View overlay */}
+                    <button 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setDetailModalProduct(product);
+                      }}
+                      className="absolute bottom-2 right-2 px-2.5 py-1 bg-slate-900/70 hover:bg-slate-900 text-white text-[9px] sm:text-[11px] font-bold rounded-lg backdrop-blur-md opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1 z-10"
                     >
-                      <ShoppingCart className="w-3.5 h-3.5 sm:w-5 sm:h-5" />
-                      Add to Cart
+                      <Info className="w-3 h-3 text-amber-400" />
+                      <span>Learn More</span>
                     </button>
                   </div>
+
+                  {/* Product Info */}
+                  <div className="p-3 sm:p-5 flex flex-col flex-1">
+                    <div className="flex items-center justify-between">
+                      <p className="text-amber-700 text-[9px] sm:text-xs font-black uppercase tracking-wider">
+                        {product.category}
+                      </p>
+                      <button
+                        onClick={() => setDetailModalProduct(product)}
+                        className="text-slate-400 hover:text-amber-600 transition-colors"
+                        title="View Remedy Guidance"
+                      >
+                        <HelpCircle className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+
+                    <h3 
+                      onClick={() => setDetailModalProduct(product)}
+                      className="text-xs sm:text-base font-black text-slate-900 mt-1 line-clamp-2 leading-tight cursor-pointer hover:text-amber-600 transition-colors"
+                    >
+                      {product.name}
+                    </h3>
+
+                    {/* Variant Option Dropdown */}
+                    {product.catalogItem && product.catalogItem.variants.length > 0 && (
+                      <div className="mt-2 text-left">
+                        <label className="block text-[9px] sm:text-[10px] font-black text-slate-500 uppercase tracking-wider mb-1">
+                          Select Specification
+                        </label>
+                        <select
+                          value={selectedVariants[product.id] || ""}
+                          onChange={(e) => setSelectedVariants(prev => ({ ...prev, [product.id]: e.target.value }))}
+                          className="w-full px-2 py-1.5 bg-amber-50/50 border border-amber-200 rounded-lg text-slate-800 text-[11px] sm:text-xs font-bold outline-none focus:border-amber-500 transition-colors"
+                        >
+                          {product.catalogItem.variants.map((v: any) => (
+                            <option key={v.option} value={v.option}>
+                              {v.option} {v.b2c ? `(₹${v.b2c})` : "(On Request)"}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    )}
+
+                    {/* Price and Smart Action Button */}
+                    <div className="mt-auto pt-3 sm:pt-4 border-t border-slate-100">
+                      <div className="flex items-center justify-between mb-2">
+                        {isPriced ? (
+                          <span className="text-sm sm:text-xl font-black text-amber-600">
+                            {priceText}
+                          </span>
+                        ) : (
+                          <span className="text-[10px] sm:text-xs font-black text-amber-800 uppercase tracking-wider bg-amber-100/70 px-2 py-0.5 rounded-md">
+                            {status === "CONSULTATION_REQUIRED" ? "Recommended after consultation" : "Price on Request"}
+                          </span>
+                        )}
+                      </div>
+
+                      {/* Smart Contextual CTAs */}
+                      {isPriced ? (
+                        <div className="space-y-1.5">
+                          <button
+                            onClick={() => handleAddToCart(product)}
+                            className="w-full px-2 sm:px-4 py-2 sm:py-2.5 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-black rounded-xl hover:shadow-lg transition-all duration-300 flex items-center justify-center gap-1.5 sm:gap-2 text-[10px] sm:text-sm"
+                          >
+                            <ShoppingCart className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                            Add to Cart
+                          </button>
+                          <button
+                            onClick={() => setEnquiryModalData({
+                              isOpen: true,
+                              productName: product.name,
+                              categoryName: product.category,
+                              selectedVariant: currentVariant,
+                              enquiryType: "consultation_request"
+                            })}
+                            className="w-full text-center text-[9px] sm:text-[10px] font-bold text-slate-500 hover:text-amber-600 py-0.5 transition-colors"
+                          >
+                            Need help choosing? Ask an Expert →
+                          </button>
+                        </div>
+                      ) : status === "CONSULTATION_REQUIRED" ? (
+                        <div className="space-y-1.5">
+                          <button
+                            onClick={() => setEnquiryModalData({
+                              isOpen: true,
+                              productName: product.name,
+                              categoryName: product.category,
+                              selectedVariant: currentVariant,
+                              enquiryType: "consultation_request"
+                            })}
+                            className="w-full px-2 sm:px-4 py-2 sm:py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-black rounded-xl shadow-md transition-all duration-300 flex items-center justify-center gap-1.5 sm:gap-2 text-[10px] sm:text-sm"
+                          >
+                            <HelpCircle className="w-3.5 h-3.5 text-amber-400" />
+                            Talk to an Expert
+                          </button>
+                          <button
+                            onClick={() => setDetailModalProduct(product)}
+                            className="w-full text-center text-[9px] sm:text-[10px] font-bold text-slate-500 hover:text-amber-600 py-0.5 transition-colors"
+                          >
+                            Understand this Remedy →
+                          </button>
+                        </div>
+                      ) : (
+                        <div className="space-y-1.5">
+                          <button
+                            onClick={() => setEnquiryModalData({
+                              isOpen: true,
+                              productName: product.name,
+                              categoryName: product.category,
+                              selectedVariant: currentVariant,
+                              enquiryType: "price_request"
+                            })}
+                            className="w-full px-2 sm:px-4 py-2 sm:py-2.5 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white font-black rounded-xl shadow-md transition-all duration-300 flex items-center justify-center gap-1.5 sm:gap-2 text-[10px] sm:text-sm"
+                          >
+                            <MessageCircle className="w-3.5 h-3.5 fill-current" />
+                            Get Latest Price →
+                          </button>
+                          <button
+                            onClick={() => setEnquiryModalData({
+                              isOpen: true,
+                              productName: product.name,
+                              categoryName: product.category,
+                              selectedVariant: currentVariant,
+                              enquiryType: "consultation_request"
+                            })}
+                            className="w-full text-center text-[9px] sm:text-[10px] font-bold text-slate-500 hover:text-amber-600 py-0.5 transition-colors"
+                          >
+                            Ask a Vastu Consultant →
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
+
+        {/* 11. "NOT SURE WHAT YOU NEED?" STORE-WIDE SALES FUNNEL SECTION */}
+        <div className="mt-16 md:mt-24 max-w-4xl mx-auto">
+          <div className="relative rounded-3xl bg-gradient-to-br from-amber-900 via-slate-900 to-amber-950 text-white p-8 sm:p-12 overflow-hidden shadow-2xl border border-amber-400/30">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-amber-500/10 blur-[60px] rounded-full pointer-events-none" />
+            
+            <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8 text-center md:text-left">
+              <div className="space-y-3 max-w-xl">
+                <div className="inline-flex items-center gap-2 px-3 py-1 bg-amber-500/20 border border-amber-400/30 rounded-full text-[10px] font-black text-amber-300 uppercase tracking-widest">
+                  <Compass className="w-3.5 h-3.5 text-amber-400 animate-spin" style={{ animationDuration: "12s" }} />
+                  Holistic Space Analysis
+                </div>
+                <h3 className="text-2xl sm:text-3xl font-black tracking-tight text-white">
+                  Not Sure Which Vastu Remedy Is Right For You?
+                </h3>
+                <p className="text-amber-100/90 text-sm sm:text-base font-normal leading-relaxed">
+                  Every home and commercial premise has unique directional energies. If you are unsure which specific metal, stone, or geometric remedy fits your layout, our certified consultants will map your space before you invest.
+                </p>
+              </div>
+
+              <div className="flex flex-col sm:flex-row md:flex-col gap-3 w-full md:w-auto flex-shrink-0">
+                <button
+                  onClick={() => setEnquiryModalData({
+                    isOpen: true,
+                    productName: `General Consultation (${categoryName})`,
+                    categoryName: categoryName,
+                    enquiryType: "consultation_request"
+                  })}
+                  className="px-6 py-4 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-black text-xs sm:text-sm uppercase tracking-wider rounded-2xl shadow-xl shadow-amber-500/25 hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-2"
+                >
+                  <MessageCircle className="w-4 h-4 fill-current" />
+                  <span>Talk to a Vastu Expert</span>
+                </button>
+
+                <button
+                  onClick={() => setIsEnergyModalOpen(true)}
+                  className="px-6 py-3.5 bg-white/10 hover:bg-white/20 text-amber-200 border border-amber-300/30 font-black text-xs sm:text-sm uppercase tracking-wider rounded-2xl backdrop-blur-md transition-all flex items-center justify-center gap-2"
+                >
+                  <Sparkles className="w-4 h-4 text-amber-300" />
+                  <span>Check Home Energy</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
       
       {/* Floating Cart Button */}
       <FloatingCart />
+
+      {/* Product Detail Education Modal */}
+      <ProductDetailModal
+        isOpen={Boolean(detailModalProduct)}
+        onClose={() => setDetailModalProduct(null)}
+        product={detailModalProduct}
+        selectedVariant={detailModalProduct ? selectedVariants[detailModalProduct.id] : undefined}
+        onSelectVariant={(v) => {
+          if (detailModalProduct) {
+            setSelectedVariants(prev => ({ ...prev, [detailModalProduct.id]: v }));
+          }
+        }}
+        onAddToCart={() => {
+          if (detailModalProduct) handleAddToCart(detailModalProduct);
+        }}
+        onOpenEnquiry={(type) => {
+          if (detailModalProduct) {
+            setEnquiryModalData({
+              isOpen: true,
+              productName: detailModalProduct.name,
+              categoryName: detailModalProduct.category,
+              selectedVariant: selectedVariants[detailModalProduct.id],
+              enquiryType: type,
+            });
+          }
+        }}
+        formattedPrice={detailModalProduct ? formatPrice(detailModalProduct) : ""}
+      />
+
+      {/* Product Enquiry / WhatsApp Funnel Modal */}
+      <ProductEnquiryModal
+        isOpen={enquiryModalData.isOpen}
+        onClose={() => setEnquiryModalData(prev => ({ ...prev, isOpen: false }))}
+        productName={enquiryModalData.productName}
+        categoryName={enquiryModalData.categoryName}
+        selectedVariant={enquiryModalData.selectedVariant}
+        enquiryType={enquiryModalData.enquiryType}
+      />
+
+      {/* Interactive Home Energy Score Modal */}
+      <HomeEnergyScoreModal
+        isOpen={isEnergyModalOpen}
+        onClose={() => setIsEnergyModalOpen(false)}
+      />
     </div>
   );
 }
