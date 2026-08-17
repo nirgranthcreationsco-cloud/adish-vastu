@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeft, Loader2, Package, ShoppingCart, Search } from "lucide-react";
+import { ArrowLeft, Loader2, Package, ShoppingCart, Search, Sparkles } from "lucide-react";
 import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -35,6 +35,7 @@ export default function CategoryPage() {
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedVariants, setSelectedVariants] = useState<Record<string, string>>({});
+  const [imageErrors, setImageErrors] = useState<Record<string, boolean>>({});
 
   const categoryId = params.categoryId as string;
   const categoryName = decodeURIComponent(categoryId).replace(/-/g, ' ');
@@ -333,17 +334,43 @@ export default function CategoryPage() {
                 key={product.id}
                 className="bg-white rounded-xl sm:rounded-2xl border border-amber-200 hover:border-amber-400 hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 overflow-hidden group flex flex-col h-full"
               >
-                {/* Product Image */}
-                <div className="relative h-36 sm:h-64 bg-slate-50 overflow-hidden flex-shrink-0">
-                  <Image
-                    src={product.image}
-                    alt={product.name}
-                    fill
-                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
-                    className="object-cover group-hover:scale-110 transition-transform duration-500"
-                  />
-                  <div className="absolute top-2 right-2 sm:top-3 sm:right-3 px-1.5 py-0.5 sm:px-3 sm:py-1 bg-amber-500 text-white text-[8px] sm:text-xs font-bold rounded-full z-10">
-                    NEW
+                {/* Product Image & Elegant Placeholder Fallback */}
+                <div className="relative h-36 sm:h-64 bg-gradient-to-br from-amber-950 via-slate-900 to-amber-900 overflow-hidden flex-shrink-0 flex items-center justify-center">
+                  {!imageErrors[product.id] && product.image ? (
+                    <Image
+                      src={product.image}
+                      alt={product.name}
+                      fill
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
+                      className="object-cover group-hover:scale-110 transition-transform duration-500"
+                      onError={() => setImageErrors((prev) => ({ ...prev, [product.id]: true }))}
+                    />
+                  ) : (
+                    <div className="relative w-full h-full flex flex-col items-center justify-center p-4 text-center overflow-hidden">
+                      {/* Ambient Golden Radial Glow */}
+                      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(245,158,11,0.22)_0%,transparent_70%)] pointer-events-none" />
+                      
+                      {/* Sacred Geometric Line Art SVG */}
+                      <svg className="w-16 h-16 sm:w-24 sm:h-24 text-amber-400/70 mb-2 group-hover:scale-110 group-hover:rotate-12 transition-transform duration-700 animate-pulse" viewBox="0 0 100 100" fill="none" stroke="currentColor">
+                        <polygon points="50,10 90,90 10,90" strokeWidth="1.5" className="text-amber-500" />
+                        <polygon points="50,90 90,10 10,10" strokeWidth="1" strokeDasharray="3 3" className="text-amber-400/50" />
+                        <circle cx="50" cy="50" r="28" strokeWidth="1.2" className="text-amber-300" />
+                        <circle cx="50" cy="50" r="14" strokeWidth="1" className="text-amber-400" />
+                        <circle cx="50" cy="50" r="4" fill="currentColor" className="text-amber-400" />
+                      </svg>
+
+                      {/* Professional Sacred Badge */}
+                      <div className="flex items-center gap-1.5 px-2.5 py-1 bg-amber-500/10 border border-amber-400/30 rounded-full backdrop-blur-md">
+                        <Sparkles className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-amber-400" />
+                        <span className="text-[8px] sm:text-[10px] font-black text-amber-200 uppercase tracking-widest">
+                          Authentic Vedic Remedy
+                        </span>
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="absolute top-2 right-2 sm:top-3 sm:right-3 px-1.5 py-0.5 sm:px-3 sm:py-1 bg-gradient-to-r from-amber-500 to-orange-500 text-white text-[8px] sm:text-xs font-bold rounded-full z-10 shadow-md">
+                    GENUINE
                   </div>
                 </div>
 
