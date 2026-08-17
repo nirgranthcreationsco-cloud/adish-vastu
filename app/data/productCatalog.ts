@@ -1366,3 +1366,56 @@ export function getPriceForVariant(productName: string, variantOption?: string):
   
   return { b2c: product.b2c, b2b: product.b2b };
 }
+
+export function matchDriveItemToCatalog(fileName: string): { product: CatalogProduct | null; variant: ProductVariant | null } {
+  const cleanName = fileName.replace(/\.[^/.]+$/, '').trim().toLowerCase();
+
+  // 1. Direct matching
+  for (const product of productCatalog) {
+    if (product.name.toLowerCase() === cleanName) {
+      return { product, variant: null };
+    }
+  }
+
+  // 2. Variant matching
+  for (const product of productCatalog) {
+    const parentNameLower = product.name.toLowerCase();
+    
+    if (product.variants.length > 0) {
+      for (const variant of product.variants) {
+        const optionLower = variant.option.toLowerCase();
+        
+        const normOption = optionLower.replace(/”/g, '"').replace(/inch/g, 'inch');
+        const normCleanName = cleanName.replace(/”/g, '"').replace(/inch/g, 'inch');
+
+        if (parentNameLower.includes("tumbles") && normCleanName.includes("tumble") && normCleanName.includes(optionLower)) {
+          return { product, variant };
+        }
+        if (parentNameLower.includes("rough stone") && normCleanName.includes("rough") && normCleanName.includes(optionLower)) {
+          return { product, variant };
+        }
+        if (parentNameLower.includes("chips") && normCleanName.includes("chips") && normCleanName.includes(optionLower)) {
+          return { product, variant };
+        }
+        if (parentNameLower.includes("tree") && normCleanName.includes("tree") && normCleanName.includes(optionLower)) {
+          return { product, variant };
+        }
+        
+        const cleanParent = parentNameLower.replace(/all /g, '').trim();
+        if (normCleanName.includes(cleanParent) && (normCleanName.includes(optionLower) || normCleanName.includes(normOption))) {
+          return { product, variant };
+        }
+      }
+    }
+  }
+  
+  // 3. Fallback fuzzy search
+  for (const product of productCatalog) {
+    const pName = product.name.toLowerCase();
+    if (cleanName.includes(pName) || pName.includes(cleanName)) {
+      return { product, variant: null };
+    }
+  }
+
+  return { product: null, variant: null };
+}
