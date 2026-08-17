@@ -1,13 +1,49 @@
 import { NextResponse } from "next/server";
 import Razorpay from "razorpay";
+import { getPriceForVariant } from "@/app/data/productCatalog";
+
 
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { amount, receipt } = body;
+    const { cart, receipt } = body;
+
+    let amountInPaise = 0;
+
+    if (cart && Array.isArray(cart)) {
+      let totalAmount = 0;
+      for (const item of cart) {
+        // Parse variant if present in the name
+        const nameParts = item.name.split(" - ");
+        const productName = nameParts[0].trim();
+        const variantOption = nameParts[1] ? nameParts[1].trim() : undefined;
+        
+        const priceObj = getPriceForVariant(productName, variantOption);
+        let itemB2CPrice = 0;
+        
+        if (priceObj.b2c) {
+          const priceStr = String(priceObj.b2c);
+          if (priceStr.includes("-")) {
+            const parts = priceStr.split("-").map(p => parseFloat(p.replace(/\D/g, "")));
+            itemB2CPrice = parts[parts.length - 1] || 0;
+          } else if (priceStr.includes("/")) {
+            const parts = priceStr.split("/").map(p => parseFloat(p.replace(/\D/g, "")));
+            itemB2CPrice = parts[parts.length - 1] || 0;
+          } else {
+            itemB2CPrice = parseFloat(priceStr.replace(/\D/g, "")) || 0;
+          }
+        }
+        
+        totalAmount += itemB2CPrice * (item.qty || 1);
+      }
+      amountInPaise = Math.round(totalAmount * 100);
+    } else {
+      const { amount } = body;
+      amountInPaise = amount;
+    }
 
     // Minimum amount validation (100 paise = 1 INR)
-    if (!amount || amount < 100) {
+    if (!amountInPaise || amountInPaise < 100) {
       return NextResponse.json(
         { error: "Amount must be at least 100 paise" },
         { status: 400 }
@@ -21,7 +57,7 @@ export async function POST(request: Request) {
     });
 
     const options = {
-      amount: amount.toString(), // amount in smallest currency unit (paise)
+      amount: amountInPaise.toString(), // amount in smallest currency unit (paise)
       currency: "INR",
       receipt: receipt || `receipt_${Date.now()}`,
     };

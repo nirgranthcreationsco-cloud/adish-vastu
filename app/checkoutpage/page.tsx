@@ -184,7 +184,7 @@ export default function CheckoutPage() {
       const orderRes = await fetch("/api/create-order", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ amount: amountInPaise, receipt: form.phone }),
+        body: JSON.stringify({ cart: cart, amount: amountInPaise, receipt: form.phone }),
       });
       orderData = await orderRes.json();
       if (!orderRes.ok) throw new Error(orderData.error || "Failed to create order");

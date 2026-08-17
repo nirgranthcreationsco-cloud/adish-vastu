@@ -6,6 +6,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import FloatingCart from "../../components/floatingcart";
 import { useCart } from "../../context/cartcontext";
+import { productCatalog, CatalogProduct, matchDriveItemToCatalog } from "@/app/data/productCatalog";
 
 interface DriveItem {
   id: string;
@@ -22,6 +23,7 @@ interface Product {
   image: string;
   price: string;
   category: string;
+  catalogItem?: CatalogProduct;
 }
 
 export default function CategoryPage() {
@@ -32,6 +34,7 @@ export default function CategoryPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedVariants, setSelectedVariants] = useState<Record<string, string>>({});
 
   const categoryId = params.categoryId as string;
   const categoryName = decodeURIComponent(categoryId).replace(/-/g, ' ');
@@ -82,19 +85,33 @@ export default function CategoryPage() {
                          item.mimeType.startsWith('image/');
           return isImage;
         })
-        .map((item: DriveItem, index: number) => {
+        .map((item: DriveItem) => {
           const imageUrl = `https://drive.google.com/thumbnail?id=${item.id}&sz=w800`;
+          const baseName = item.name.replace(/\.[^/.]+$/, '').trim();
+          
+          // Match Drive item with structured catalog
+          const match = matchDriveItemToCatalog(baseName);
 
           return {
             id: item.id,
-            name: item.name.replace(/\.[^/.]+$/, ''),
+            name: match.product ? match.product.name : baseName,
             image: imageUrl,
-            price: `₹${(index + 1) * 999}`,
+            price: "", // Will be formatted dynamically
             category: categoryName,
+            catalogItem: match.product || undefined,
           };
         });
 
       setProducts(transformedProducts);
+      
+      // Initialize selected variants with first option
+      const initialVariants: Record<string, string> = {};
+      transformedProducts.forEach(p => {
+        if (p.catalogItem && p.catalogItem.variants.length > 0) {
+          initialVariants[p.id] = p.catalogItem.variants[0].option;
+        }
+      });
+      setSelectedVariants(initialVariants);
     } catch (err: any) {
       console.error('❌ Error fetching products:', err);
       setError(err.message || 'Failed to load products');
@@ -103,10 +120,51 @@ export default function CategoryPage() {
     }
   };
 
+  const formatPrice = (product: Product) => {
+    let b2c: number | string | null = null;
+    let unit = "";
+    
+    if (product.catalogItem) {
+      if (product.catalogItem.variants.length > 0) {
+        const opt = selectedVariants[product.id] || product.catalogItem.variants[0].option;
+        const matchVar = product.catalogItem.variants.find((v: any) => v.option === opt);
+        if (matchVar) b2c = matchVar.b2c;
+      } else {
+        b2c = product.catalogItem.b2c;
+      }
+
+      if (b2c !== null && b2c !== undefined) {
+        const b2cStr = String(b2c);
+        if (b2cStr.includes("-") || b2cStr.includes("/")) {
+          return `₹${b2cStr}`;
+        }
+        
+        const nameLower = product.catalogItem.name.toLowerCase();
+        if (nameLower.includes("rough stone") || nameLower.includes("chips")) {
+          unit = " / kg";
+        } else if (nameLower.includes("tumbles")) {
+          unit = " / 200g";
+        }
+        
+        return `₹${b2c}${unit}`;
+      }
+    }
+    
+    return "Contact for Price";
+  };
+
   const handleAddToCart = (product: Product) => {
+    const option = selectedVariants[product.id];
+    let cartName = product.name;
+    let priceStr = formatPrice(product);
+
+    if (option) {
+      cartName = `${product.name} - ${option}`;
+    }
+
     addToCart({
-      name: product.name,
-      price: product.price,
+      name: cartName,
+      price: priceStr,
       image: product.image,
     });
   };
@@ -298,11 +356,30 @@ export default function CategoryPage() {
                     {product.name}
                   </h3>
 
+                  {product.catalogItem && product.catalogItem.variants.length > 0 && (
+                    <div className="mt-2 text-left">
+                      <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">
+                        Select Option
+                      </label>
+                      <select
+                        value={selectedVariants[product.id] || ""}
+                        onChange={(e) => setSelectedVariants(prev => ({ ...prev, [product.id]: e.target.value }))}
+                        className="w-full px-2 py-1.5 bg-amber-50/50 border border-amber-200 rounded-lg text-slate-800 text-xs font-bold outline-none focus:border-amber-500 transition-colors"
+                      >
+                        {product.catalogItem.variants.map((v: any) => (
+                          <option key={v.option} value={v.option}>
+                            {v.option}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
+
                   {/* Price and Button pushed to bottom */}
                   <div className="mt-auto pt-3 sm:pt-4">
                     <div className="flex items-center justify-between">
                       <span className="text-sm sm:text-2xl font-bold text-amber-600">
-                        {product.price}
+                        {formatPrice(product)}
                       </span>
                     </div>
 
