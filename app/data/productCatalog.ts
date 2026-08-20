@@ -15,8 +15,11 @@ export interface ProductEducationalInfo {
 export type ProductStatus = 'DIRECT_PURCHASE' | 'ENQUIRE_PRICE' | 'VARIABLE_PRICE' | 'CONSULTATION_REQUIRED';
 
 export interface CatalogProduct {
+  id: string;
   name: string;
   category: string;
+  image: string;
+  imageId: string | null;
   b2b: string | number | null;
   b2c: string | number | null;
   variants: ProductVariant[];
@@ -25,36 +28,49 @@ export interface CatalogProduct {
 
 export const productCatalog: CatalogProduct[] = [
   {
+    "id": "prod-1",
     "name": "Copper L rod",
-    "category": "Metals / Strips / Helix",
+    "category": "Vastu Remedies",
     "b2b": 1400,
     "b2c": 1550,
-    "variants": []
+    "variants": [],
+    "imageId": "1n2YTLibMCI9DDwfoc9hLYheG2JHkJRY_",
+    "image": "https://drive.google.com/thumbnail?id=1n2YTLibMCI9DDwfoc9hLYheG2JHkJRY_&sz=w800"
   },
   {
+    "id": "prod-2",
     "name": "Copper L rod with bering handle",
-    "category": "Metals / Strips / Helix",
+    "category": "Vastu Remedies",
     "b2b": 2350,
     "b2c": 2550,
-    "variants": []
+    "variants": [],
+    "imageId": null,
+    "image": "/sacred_remedies.png"
   },
   {
+    "id": "prod-3",
     "name": "Brass L rod with bering handle",
-    "category": "Metals / Strips / Helix",
+    "category": "Vastu Remedies",
     "b2b": 2350,
     "b2c": 2550,
-    "variants": []
+    "variants": [],
+    "imageId": null,
+    "image": "/sacred_remedies.png"
   },
   {
+    "id": "prod-4",
     "name": "Lecher antenna",
-    "category": "Other Vastu Products",
+    "category": "Vastu Remedies",
     "b2b": 4800,
     "b2c": 5050,
-    "variants": []
+    "variants": [],
+    "imageId": null,
+    "image": "/sacred_remedies.png"
   },
   {
+    "id": "prod-5",
     "name": "Copper pyramid",
-    "category": "Pyramids",
+    "category": "Vastu Remedies",
     "b2b": null,
     "b2c": null,
     "variants": [
@@ -88,11 +104,14 @@ export const productCatalog: CatalogProduct[] = [
         "b2b": 1600,
         "b2c": 1750
       }
-    ]
+    ],
+    "imageId": "1wjUPHRk-eiaq-LM0pnO_VrFoO9v8n5nW",
+    "image": "https://drive.google.com/thumbnail?id=1wjUPHRk-eiaq-LM0pnO_VrFoO9v8n5nW&sz=w800"
   },
   {
+    "id": "prod-6",
     "name": "Brass pyramid",
-    "category": "Pyramids",
+    "category": "Vastu Remedies",
     "b2b": null,
     "b2c": null,
     "variants": [
@@ -121,11 +140,14 @@ export const productCatalog: CatalogProduct[] = [
         "b2b": 850,
         "b2c": 950
       }
-    ]
+    ],
+    "imageId": "1Qi_XpicLmPIM2nDkV1MpfREPzlj89S0f",
+    "image": "https://drive.google.com/thumbnail?id=1Qi_XpicLmPIM2nDkV1MpfREPzlj89S0f&sz=w800"
   },
   {
+    "id": "prod-7",
     "name": "Tridhatu pyramid",
-    "category": "Pyramids",
+    "category": "Vastu Remedies",
     "b2b": null,
     "b2c": null,
     "variants": [
@@ -139,39 +161,54 @@ export const productCatalog: CatalogProduct[] = [
         "b2b": 320,
         "b2c": 390
       }
-    ]
+    ],
+    "imageId": "1C_ADsQxejlN1jFIXOgzjGHkbzrHf7mL_",
+    "image": "https://drive.google.com/thumbnail?id=1C_ADsQxejlN1jFIXOgzjGHkbzrHf7mL_&sz=w800"
   },
   {
+    "id": "prod-8",
     "name": "Liquid Mercury / parad",
-    "category": "Other Vastu Products",
+    "category": "Vastu Remedies",
     "b2b": 750000,
     "b2c": 820000,
-    "variants": []
+    "variants": [],
+    "imageId": null,
+    "image": "/sacred_remedies.png"
   },
   {
+    "id": "prod-9",
     "name": "Mercury / parad pyramid",
-    "category": "Pyramids",
+    "category": "Vastu Remedies",
     "b2b": 1250,
     "b2c": 1400,
-    "variants": []
+    "variants": [],
+    "imageId": null,
+    "image": "/sacred_remedies.png"
   },
   {
+    "id": "prod-10",
     "name": "Mercury / parad swastika",
-    "category": "Swastika / Chakra",
+    "category": "Vastu Remedies",
     "b2b": 1350,
     "b2c": 1450,
-    "variants": []
+    "variants": [],
+    "imageId": null,
+    "image": "/sacred_remedies.png"
   },
   {
+    "id": "prod-11",
     "name": "Mercury / parad killak / nail",
-    "category": "Other Vastu Products",
+    "category": "Vastu Remedies",
     "b2b": 480,
     "b2c": 530,
-    "variants": []
+    "variants": [],
+    "imageId": null,
+    "image": "/sacred_remedies.png"
   },
   {
+    "id": "prod-12",
     "name": "Nandavarta swastika copper",
-    "category": "Swastika / Chakra",
+    "category": "Vastu Remedies",
     "b2b": null,
     "b2c": null,
     "variants": [
@@ -190,11 +227,14 @@ export const productCatalog: CatalogProduct[] = [
         "b2b": 75,
         "b2c": 80
       }
-    ]
+    ],
+    "imageId": null,
+    "image": "/sacred_remedies.png"
   },
   {
+    "id": "prod-13",
     "name": "Tridhatu nandavarta swastika",
-    "category": "Swastika / Chakra",
+    "category": "Vastu Remedies",
     "b2b": null,
     "b2c": null,
     "variants": [
@@ -213,11 +253,14 @@ export const productCatalog: CatalogProduct[] = [
         "b2b": 90,
         "b2c": 100
       }
-    ]
+    ],
+    "imageId": null,
+    "image": "/sacred_remedies.png"
   },
   {
+    "id": "prod-14",
     "name": "Silver nandavarta swastika",
-    "category": "Swastika / Chakra",
+    "category": "Vastu Remedies",
     "b2b": null,
     "b2c": null,
     "variants": [
@@ -231,81 +274,114 @@ export const productCatalog: CatalogProduct[] = [
         "b2b": 1050,
         "b2c": 1100
       }
-    ]
+    ],
+    "imageId": null,
+    "image": "/sacred_remedies.png"
   },
   {
+    "id": "prod-15",
     "name": "Eaching Aura Booster",
-    "category": "Other Vastu Products",
+    "category": "Vastu Remedies",
     "b2b": 600,
     "b2c": 650,
-    "variants": []
+    "variants": [],
+    "imageId": "1X07gcjNo9lCcjSRuz8_4AFeU2_bVAO-L",
+    "image": "https://drive.google.com/thumbnail?id=1X07gcjNo9lCcjSRuz8_4AFeU2_bVAO-L&sz=w800"
   },
   {
+    "id": "prod-16",
     "name": "Hanuman Aura Booster",
-    "category": "Other Vastu Products",
+    "category": "Vastu Remedies",
     "b2b": 450,
     "b2c": 520,
-    "variants": []
+    "variants": [],
+    "imageId": "1X07gcjNo9lCcjSRuz8_4AFeU2_bVAO-L",
+    "image": "https://drive.google.com/thumbnail?id=1X07gcjNo9lCcjSRuz8_4AFeU2_bVAO-L&sz=w800"
   },
   {
+    "id": "prod-17",
     "name": "Aura Booster.",
-    "category": "Other Vastu Products",
+    "category": "Vastu Remedies",
     "b2b": 380,
     "b2c": 420,
-    "variants": []
+    "variants": [],
+    "imageId": "1X07gcjNo9lCcjSRuz8_4AFeU2_bVAO-L",
+    "image": "https://drive.google.com/thumbnail?id=1X07gcjNo9lCcjSRuz8_4AFeU2_bVAO-L&sz=w800"
   },
   {
+    "id": "prod-18",
     "name": "Vastu Toilet Blocker with 9 prymid plate",
-    "category": "Pyramids",
+    "category": "Vastu Remedies",
     "b2b": 600,
     "b2c": 750,
-    "variants": []
+    "variants": [],
+    "imageId": null,
+    "image": "/sacred_remedies.png"
   },
   {
+    "id": "prod-19",
     "name": "Vastu Toilet Pacifier, Negative Energy Blocker, Toilet Negative Energy Blocker, full brass body.",
-    "category": "Other Vastu Products",
+    "category": "Vastu Remedies",
     "b2b": 600,
     "b2c": 750,
-    "variants": []
+    "variants": [],
+    "imageId": null,
+    "image": "/sacred_remedies.png"
   },
   {
+    "id": "prod-20",
     "name": "Vastu Entry Blocker",
-    "category": "Other Vastu Products",
+    "category": "Vastu Remedies",
     "b2b": 470,
     "b2c": 670,
-    "variants": []
+    "variants": [],
+    "imageId": "1EabQTHUv7rsKdZAldtfN0etzic9D4Uzx",
+    "image": "https://drive.google.com/thumbnail?id=1EabQTHUv7rsKdZAldtfN0etzic9D4Uzx&sz=w800"
   },
   {
+    "id": "prod-21",
     "name": "Al metal geopathic stress rod",
-    "category": "Metals / Strips / Helix",
+    "category": "Vastu Remedies",
     "b2b": "600 - 1400",
     "b2c": "700 - 1700",
-    "variants": []
+    "variants": [],
+    "imageId": "1WyzVdMwf7LdcrZcSgYYVYECG7Bjd6nyr",
+    "image": "https://drive.google.com/thumbnail?id=1WyzVdMwf7LdcrZcSgYYVYECG7Bjd6nyr&sz=w800"
   },
   {
+    "id": "prod-22",
     "name": "8 direction rod",
-    "category": "Metals / Strips / Helix",
+    "category": "Vastu Remedies",
     "b2b": 4500,
     "b2c": 4800,
-    "variants": []
+    "variants": [],
+    "imageId": null,
+    "image": "/sacred_remedies.png"
   },
   {
+    "id": "prod-23",
     "name": "Vastu Toilet blocker",
-    "category": "Other Vastu Products",
+    "category": "Vastu Remedies",
     "b2b": 600,
     "b2c": 750,
-    "variants": []
+    "variants": [],
+    "imageId": "1EabQTHUv7rsKdZAldtfN0etzic9D4Uzx",
+    "image": "https://drive.google.com/thumbnail?id=1EabQTHUv7rsKdZAldtfN0etzic9D4Uzx&sz=w800"
   },
   {
+    "id": "prod-24",
     "name": "Vastu Fire Balancer",
-    "category": "Other Vastu Products",
+    "category": "Vastu Remedies",
     "b2b": 600,
     "b2c": 750,
-    "variants": []
+    "variants": [],
+    "imageId": null,
+    "image": "/sacred_remedies.png"
   },
   {
+    "id": "prod-25",
     "name": "Copper strips",
-    "category": "Metals / Strips / Helix",
+    "category": "Vastu Remedies",
     "b2b": null,
     "b2c": null,
     "variants": [
@@ -319,11 +395,14 @@ export const productCatalog: CatalogProduct[] = [
         "b2b": 28,
         "b2c": 35
       }
-    ]
+    ],
+    "imageId": "1n2YTLibMCI9DDwfoc9hLYheG2JHkJRY_",
+    "image": "https://drive.google.com/thumbnail?id=1n2YTLibMCI9DDwfoc9hLYheG2JHkJRY_&sz=w800"
   },
   {
+    "id": "prod-26",
     "name": "Brass Strip",
-    "category": "Metals / Strips / Helix",
+    "category": "Vastu Remedies",
     "b2b": null,
     "b2c": null,
     "variants": [
@@ -337,11 +416,14 @@ export const productCatalog: CatalogProduct[] = [
         "b2b": 28,
         "b2c": 35
       }
-    ]
+    ],
+    "imageId": "1o07mY2Sx2irI0rv5R5wQjLAnrhpCRA3j",
+    "image": "https://drive.google.com/thumbnail?id=1o07mY2Sx2irI0rv5R5wQjLAnrhpCRA3j&sz=w800"
   },
   {
+    "id": "prod-27",
     "name": "Stainless steel strip",
-    "category": "Metals / Strips / Helix",
+    "category": "Vastu Remedies",
     "b2b": null,
     "b2c": null,
     "variants": [
@@ -355,11 +437,14 @@ export const productCatalog: CatalogProduct[] = [
         "b2b": 25,
         "b2c": 30
       }
-    ]
+    ],
+    "imageId": null,
+    "image": "/sacred_remedies.png"
   },
   {
+    "id": "prod-28",
     "name": "Aluminium Strip",
-    "category": "Metals / Strips / Helix",
+    "category": "Vastu Remedies",
     "b2b": null,
     "b2c": null,
     "variants": [
@@ -373,11 +458,14 @@ export const productCatalog: CatalogProduct[] = [
         "b2b": 25,
         "b2c": 30
       }
-    ]
+    ],
+    "imageId": "1Bz_rtk1zis1Nx9_ZWglpBFVpyEwlK2zM",
+    "image": "https://drive.google.com/thumbnail?id=1Bz_rtk1zis1Nx9_ZWglpBFVpyEwlK2zM&sz=w800"
   },
   {
+    "id": "prod-29",
     "name": "Iron Strip",
-    "category": "Metals / Strips / Helix",
+    "category": "Vastu Remedies",
     "b2b": null,
     "b2c": null,
     "variants": [
@@ -391,11 +479,14 @@ export const productCatalog: CatalogProduct[] = [
         "b2b": 25,
         "b2c": 30
       }
-    ]
+    ],
+    "imageId": "1RoqQTFzIR_FNtBwITs1PUREzaLYDTUJ3",
+    "image": "https://drive.google.com/thumbnail?id=1RoqQTFzIR_FNtBwITs1PUREzaLYDTUJ3&sz=w800"
   },
   {
+    "id": "prod-30",
     "name": "Tridhatu strip",
-    "category": "Metals / Strips / Helix",
+    "category": "Vastu Remedies",
     "b2b": null,
     "b2c": null,
     "variants": [
@@ -404,11 +495,14 @@ export const productCatalog: CatalogProduct[] = [
         "b2b": 145,
         "b2c": 155
       }
-    ]
+    ],
+    "imageId": "1C_ADsQxejlN1jFIXOgzjGHkbzrHf7mL_",
+    "image": "https://drive.google.com/thumbnail?id=1C_ADsQxejlN1jFIXOgzjGHkbzrHf7mL_&sz=w800"
   },
   {
+    "id": "prod-31",
     "name": "All metal strip with muscovite",
-    "category": "Metals / Strips / Helix",
+    "category": "Vastu Remedies",
     "b2b": null,
     "b2c": null,
     "variants": [
@@ -437,11 +531,14 @@ export const productCatalog: CatalogProduct[] = [
         "b2b": 70,
         "b2c": 80
       }
-    ]
+    ],
+    "imageId": "1_vKgIPIGlfcZYKjFSM5_SX0IFEYI9Ls8",
+    "image": "https://drive.google.com/thumbnail?id=1_vKgIPIGlfcZYKjFSM5_SX0IFEYI9Ls8&sz=w800"
   },
   {
+    "id": "prod-32",
     "name": "Copper Helix",
-    "category": "Metals / Strips / Helix",
+    "category": "Vastu Remedies",
     "b2b": null,
     "b2c": null,
     "variants": [
@@ -455,11 +552,14 @@ export const productCatalog: CatalogProduct[] = [
         "b2b": 580,
         "b2c": 680
       }
-    ]
+    ],
+    "imageId": "15dcKvjJHP5UU7uDvqpeHEYbZuGj_QyA7",
+    "image": "https://drive.google.com/thumbnail?id=15dcKvjJHP5UU7uDvqpeHEYbZuGj_QyA7&sz=w800"
   },
   {
+    "id": "prod-33",
     "name": "Brass Helix",
-    "category": "Metals / Strips / Helix",
+    "category": "Vastu Remedies",
     "b2b": null,
     "b2c": null,
     "variants": [
@@ -473,11 +573,14 @@ export const productCatalog: CatalogProduct[] = [
         "b2b": 549,
         "b2c": 660
       }
-    ]
+    ],
+    "imageId": "1twt4s6zjz58d8rnoZ1x-lEkhN0zOtIdC",
+    "image": "https://drive.google.com/thumbnail?id=1twt4s6zjz58d8rnoZ1x-lEkhN0zOtIdC&sz=w800"
   },
   {
+    "id": "prod-34",
     "name": "Zinc Helix",
-    "category": "Metals / Strips / Helix",
+    "category": "Vastu Remedies",
     "b2b": null,
     "b2c": null,
     "variants": [
@@ -491,11 +594,14 @@ export const productCatalog: CatalogProduct[] = [
         "b2b": 450,
         "b2c": 530
       }
-    ]
+    ],
+    "imageId": "1twt4s6zjz58d8rnoZ1x-lEkhN0zOtIdC",
+    "image": "https://drive.google.com/thumbnail?id=1twt4s6zjz58d8rnoZ1x-lEkhN0zOtIdC&sz=w800"
   },
   {
+    "id": "prod-35",
     "name": "Aluminium Helix",
-    "category": "Metals / Strips / Helix",
+    "category": "Vastu Remedies",
     "b2b": null,
     "b2c": null,
     "variants": [
@@ -509,11 +615,14 @@ export const productCatalog: CatalogProduct[] = [
         "b2b": 350,
         "b2c": 420
       }
-    ]
+    ],
+    "imageId": "1Bz_rtk1zis1Nx9_ZWglpBFVpyEwlK2zM",
+    "image": "https://drive.google.com/thumbnail?id=1Bz_rtk1zis1Nx9_ZWglpBFVpyEwlK2zM&sz=w800"
   },
   {
+    "id": "prod-36",
     "name": "Lead Helix",
-    "category": "Metals / Strips / Helix",
+    "category": "Vastu Remedies",
     "b2b": null,
     "b2c": null,
     "variants": [
@@ -527,11 +636,14 @@ export const productCatalog: CatalogProduct[] = [
         "b2b": 480,
         "b2c": 550
       }
-    ]
+    ],
+    "imageId": "1twt4s6zjz58d8rnoZ1x-lEkhN0zOtIdC",
+    "image": "https://drive.google.com/thumbnail?id=1twt4s6zjz58d8rnoZ1x-lEkhN0zOtIdC&sz=w800"
   },
   {
+    "id": "prod-37",
     "name": "Advance English Shakti Chakra",
-    "category": "Swastika / Chakra",
+    "category": "Vastu Remedies",
     "b2b": null,
     "b2c": null,
     "variants": [
@@ -550,11 +662,14 @@ export const productCatalog: CatalogProduct[] = [
         "b2b": 220,
         "b2c": 300
       }
-    ]
+    ],
+    "imageId": null,
+    "image": "/sacred_remedies.png"
   },
   {
+    "id": "prod-38",
     "name": "English Shakti Chakra",
-    "category": "Swastika / Chakra",
+    "category": "Vastu Remedies",
     "b2b": null,
     "b2c": null,
     "variants": [
@@ -573,11 +688,14 @@ export const productCatalog: CatalogProduct[] = [
         "b2b": 220,
         "b2c": 300
       }
-    ]
+    ],
+    "imageId": null,
+    "image": "/sacred_remedies.png"
   },
   {
+    "id": "prod-39",
     "name": "Vastu Disha Shakti Chakra Hindi",
-    "category": "Swastika / Chakra",
+    "category": "Vastu Remedies",
     "b2b": null,
     "b2c": null,
     "variants": [
@@ -586,32 +704,44 @@ export const productCatalog: CatalogProduct[] = [
         "b2b": 220,
         "b2c": 300
       }
-    ]
+    ],
+    "imageId": null,
+    "image": "/sacred_remedies.png"
   },
   {
+    "id": "prod-40",
     "name": "Dowsing board",
-    "category": "Other Vastu Products",
+    "category": "Vastu Remedies",
     "b2b": 220,
     "b2c": 300,
-    "variants": []
+    "variants": [],
+    "imageId": "1yBKsheE4mZfXao2ojaTdSx-ltHz2dKIG",
+    "image": "https://drive.google.com/thumbnail?id=1yBKsheE4mZfXao2ojaTdSx-ltHz2dKIG&sz=w800"
   },
   {
+    "id": "prod-41",
     "name": "Brass pendulums",
-    "category": "Other Vastu Products",
+    "category": "Vastu Remedies",
     "b2b": 220,
     "b2c": 300,
-    "variants": []
+    "variants": [],
+    "imageId": "1yBKsheE4mZfXao2ojaTdSx-ltHz2dKIG",
+    "image": "https://drive.google.com/thumbnail?id=1yBKsheE4mZfXao2ojaTdSx-ltHz2dKIG&sz=w800"
   },
   {
+    "id": "prod-42",
     "name": "Stone pendulums",
-    "category": "Crystals & Stones",
+    "category": "Vastu Remedies",
     "b2b": 120,
     "b2c": null,
-    "variants": []
+    "variants": [],
+    "imageId": "1g0kn631M_L9lDxLhpaGC1LQbzPKUTfLn",
+    "image": "https://drive.google.com/thumbnail?id=1g0kn631M_L9lDxLhpaGC1LQbzPKUTfLn&sz=w800"
   },
   {
+    "id": "prod-43",
     "name": "All metal 3 layer pyramid",
-    "category": "Pyramids",
+    "category": "Vastu Remedies",
     "b2b": null,
     "b2c": null,
     "variants": [
@@ -640,11 +770,14 @@ export const productCatalog: CatalogProduct[] = [
         "b2b": 520,
         "b2c": 620
       }
-    ]
+    ],
+    "imageId": "1aH0-8SmRPbX-kpzRu2JRCKM51IyicRD2",
+    "image": "https://drive.google.com/thumbnail?id=1aH0-8SmRPbX-kpzRu2JRCKM51IyicRD2&sz=w800"
   },
   {
+    "id": "prod-44",
     "name": "All metal 2 layer pyramid",
-    "category": "Pyramids",
+    "category": "Vastu Remedies",
     "b2b": null,
     "b2c": null,
     "variants": [
@@ -673,200 +806,284 @@ export const productCatalog: CatalogProduct[] = [
         "b2b": null,
         "b2c": null
       }
-    ]
+    ],
+    "imageId": "1aH0-8SmRPbX-kpzRu2JRCKM51IyicRD2",
+    "image": "https://drive.google.com/thumbnail?id=1aH0-8SmRPbX-kpzRu2JRCKM51IyicRD2&sz=w800"
   },
   {
+    "id": "prod-45",
     "name": "Red elephant",
-    "category": "Decorative Items",
+    "category": "Vastu Statue",
     "b2b": null,
     "b2c": null,
-    "variants": []
+    "variants": [],
+    "imageId": "1lynSGXXSsP_LkQ9DMUFlA0MzLEHO7136_stat",
+    "image": "https://drive.google.com/thumbnail?id=1lynSGXXSsP_LkQ9DMUFlA0MzLEHO7136_stat&sz=w800"
   },
   {
+    "id": "prod-46",
     "name": "Red horse",
-    "category": "Decorative Items",
+    "category": "Vastu Statue",
     "b2b": 800,
     "b2c": 900,
-    "variants": []
+    "variants": [],
+    "imageId": "19w9fJCKyQf5e18tF7tkdJCtabC5bNPZA",
+    "image": "https://drive.google.com/thumbnail?id=19w9fJCKyQf5e18tF7tkdJCtabC5bNPZA&sz=w800"
   },
   {
+    "id": "prod-47",
     "name": "Love birds",
-    "category": "Decorative Items",
+    "category": "Vastu Statue",
     "b2b": 1500,
     "b2c": 1650,
-    "variants": []
+    "variants": [],
+    "imageId": "1lynSGXXSsP_LkQ9DMUFlA0MzLEHO7136_stat",
+    "image": "https://drive.google.com/thumbnail?id=1lynSGXXSsP_LkQ9DMUFlA0MzLEHO7136_stat&sz=w800"
   },
   {
+    "id": "prod-48",
     "name": "All brass statue",
-    "category": "Decorative Items",
+    "category": "Vastu Statue",
     "b2b": null,
     "b2c": null,
-    "variants": []
+    "variants": [],
+    "imageId": "18yQNQDKuBHYlgXmAduZvbUFiAXJvLnCp",
+    "image": "https://drive.google.com/thumbnail?id=18yQNQDKuBHYlgXmAduZvbUFiAXJvLnCp&sz=w800"
   },
   {
+    "id": "prod-49",
     "name": "Yellow kodi, Black kodi, White kodi",
     "category": "Vastu Remedies",
     "b2b": "2300/1400/600",
     "b2c": "2500/1600/800",
-    "variants": []
+    "variants": [],
+    "imageId": null,
+    "image": "/sacred_remedies.png"
   },
   {
+    "id": "prod-50",
     "name": "Shakti chakra",
-    "category": "Swastika / Chakra",
+    "category": "Vastu Remedies",
     "b2b": null,
     "b2c": null,
-    "variants": []
+    "variants": [],
+    "imageId": "1z_cMq0ZtUYAcan1B7I-4oHQq8YYDXifr",
+    "image": "https://drive.google.com/thumbnail?id=1z_cMq0ZtUYAcan1B7I-4oHQq8YYDXifr&sz=w800"
   },
   {
+    "id": "prod-51",
     "name": "Black, White, Red Gomchi",
     "category": "Vastu Remedies",
     "b2b": "2200/2000/900",
     "b2c": "2400/2200/1000",
-    "variants": []
+    "variants": [],
+    "imageId": null,
+    "image": "/sacred_remedies.png"
   },
   {
+    "id": "prod-52",
     "name": "Safed sarso",
     "category": "Vastu Remedies",
     "b2b": 2350,
     "b2c": 2800,
-    "variants": []
+    "variants": [],
+    "imageId": "1CIGa0phmBqaxuDW-SzZSQA5oIpPw78oq",
+    "image": "https://drive.google.com/thumbnail?id=1CIGa0phmBqaxuDW-SzZSQA5oIpPw78oq&sz=w800"
   },
   {
+    "id": "prod-53",
     "name": "Pilli sarso",
     "category": "Vastu Remedies",
     "b2b": 240,
     "b2c": 350,
-    "variants": []
+    "variants": [],
+    "imageId": "1CIGa0phmBqaxuDW-SzZSQA5oIpPw78oq",
+    "image": "https://drive.google.com/thumbnail?id=1CIGa0phmBqaxuDW-SzZSQA5oIpPw78oq&sz=w800"
   },
   {
+    "id": "prod-54",
     "name": "Business dhoop",
     "category": "Vastu Remedies",
     "b2b": 1000,
     "b2c": 1200,
-    "variants": []
+    "variants": [],
+    "imageId": "1SFSsajj1WgAgwxUUuwSFdBEwBgMWeYK4",
+    "image": "https://drive.google.com/thumbnail?id=1SFSsajj1WgAgwxUUuwSFdBEwBgMWeYK4&sz=w800"
   },
   {
+    "id": "prod-55",
     "name": "Land energy dhoop",
     "category": "Vastu Remedies",
     "b2b": 1000,
     "b2c": 1200,
-    "variants": []
+    "variants": [],
+    "imageId": null,
+    "image": "/sacred_remedies.png"
   },
   {
+    "id": "prod-56",
     "name": "Clear quartz small size",
-    "category": "Crystals & Stones",
+    "category": "Vastu Remedies",
     "b2b": 850,
     "b2c": 1000,
-    "variants": []
+    "variants": [],
+    "imageId": null,
+    "image": "/sacred_remedies.png"
   },
   {
+    "id": "prod-57",
     "name": "Clear quartz medium size",
-    "category": "Crystals & Stones",
+    "category": "Vastu Remedies",
     "b2b": 1150,
     "b2c": 1300,
-    "variants": []
+    "variants": [],
+    "imageId": null,
+    "image": "/sacred_remedies.png"
   },
   {
+    "id": "prod-58",
     "name": "Clear quartz big size",
-    "category": "Crystals & Stones",
+    "category": "Vastu Remedies",
     "b2b": 1250,
     "b2c": 1400,
-    "variants": []
+    "variants": [],
+    "imageId": "1hkV46bi78XCjQfeGyquJ92fTlgW3LxTq",
+    "image": "https://drive.google.com/thumbnail?id=1hkV46bi78XCjQfeGyquJ92fTlgW3LxTq&sz=w800"
   },
   {
+    "id": "prod-59",
     "name": "Brass padam plate",
-    "category": "Other Vastu Products",
+    "category": "Vastu Remedies",
     "b2b": 980,
     "b2c": 1100,
-    "variants": []
+    "variants": [],
+    "imageId": "1yBKsheE4mZfXao2ojaTdSx-ltHz2dKIG",
+    "image": "https://drive.google.com/thumbnail?id=1yBKsheE4mZfXao2ojaTdSx-ltHz2dKIG&sz=w800"
   },
   {
+    "id": "prod-60",
     "name": "Copper padam plate",
-    "category": "Other Vastu Products",
+    "category": "Vastu Remedies",
     "b2b": 950,
     "b2c": 1100,
-    "variants": []
+    "variants": [],
+    "imageId": "1n2YTLibMCI9DDwfoc9hLYheG2JHkJRY_",
+    "image": "https://drive.google.com/thumbnail?id=1n2YTLibMCI9DDwfoc9hLYheG2JHkJRY_&sz=w800"
   },
   {
+    "id": "prod-61",
     "name": "All coulor taps",
-    "category": "Other Vastu Products",
+    "category": "Vastu Remedies",
     "b2b": null,
     "b2c": null,
-    "variants": []
+    "variants": [],
+    "imageId": null,
+    "image": "/sacred_remedies.png"
   },
   {
+    "id": "prod-62",
     "name": "(W – 4” / L – 25m)",
-    "category": "Other Vastu Products",
+    "category": "Vastu Remedies",
     "b2b": 330,
     "b2c": 400,
-    "variants": []
+    "variants": [],
+    "imageId": null,
+    "image": "/sacred_remedies.png"
   },
   {
+    "id": "prod-63",
     "name": "Muscovite powder",
-    "category": "Other Vastu Products",
+    "category": "Vastu Remedies",
     "b2b": 140,
     "b2c": 180,
-    "variants": []
+    "variants": [],
+    "imageId": null,
+    "image": "/sacred_remedies.png"
   },
   {
+    "id": "prod-64",
     "name": "Muscovite sheet",
-    "category": "Other Vastu Products",
+    "category": "Vastu Remedies",
     "b2b": 900,
     "b2c": 1050,
-    "variants": []
+    "variants": [],
+    "imageId": null,
+    "image": "/sacred_remedies.png"
   },
   {
+    "id": "prod-65",
     "name": "Dowsing board",
-    "category": "Other Vastu Products",
+    "category": "Vastu Remedies",
     "b2b": null,
     "b2c": null,
-    "variants": []
+    "variants": [],
+    "imageId": "1yBKsheE4mZfXao2ojaTdSx-ltHz2dKIG",
+    "image": "https://drive.google.com/thumbnail?id=1yBKsheE4mZfXao2ojaTdSx-ltHz2dKIG&sz=w800"
   },
   {
+    "id": "prod-66",
     "name": "Compass",
-    "category": "Other Vastu Products",
+    "category": "Vastu Remedies",
     "b2b": 750,
     "b2c": 850,
-    "variants": []
+    "variants": [],
+    "imageId": null,
+    "image": "/sacred_remedies.png"
   },
   {
+    "id": "prod-67",
     "name": "Village scenery",
-    "category": "Other Vastu Products",
+    "category": "Vastu Remedies",
     "b2b": 1100,
     "b2c": 1300,
-    "variants": []
+    "variants": [],
+    "imageId": null,
+    "image": "/sacred_remedies.png"
   },
   {
+    "id": "prod-68",
     "name": "All rough stone",
-    "category": "Crystals & Stones",
+    "category": "Vastu Remedies",
     "b2b": "rate in kg",
     "b2c": null,
-    "variants": []
+    "variants": [],
+    "imageId": "1dV2wDRwV2wLU6tJcEk3HO0l_Q-MpeivV",
+    "image": "https://drive.google.com/thumbnail?id=1dV2wDRwV2wLU6tJcEk3HO0l_Q-MpeivV&sz=w800"
   },
   {
+    "id": "prod-69",
     "name": "Citrine",
-    "category": "Crystals & Stones",
+    "category": "Vastu Remedies",
     "b2b": 3200,
     "b2c": 3800,
-    "variants": []
+    "variants": [],
+    "imageId": "1Ml0LxW2bVqHOvqGvHvEBwpl4bUx0WNI_",
+    "image": "https://drive.google.com/thumbnail?id=1Ml0LxW2bVqHOvqGvHvEBwpl4bUx0WNI_&sz=w800"
   },
   {
+    "id": "prod-70",
     "name": "Amethyst",
-    "category": "Crystals & Stones",
+    "category": "Vastu Remedies",
     "b2b": 900,
     "b2c": 1200,
-    "variants": []
+    "variants": [],
+    "imageId": "1--O7SGOhn1Z-wY6iUq_zivXYmxTbkCse",
+    "image": "https://drive.google.com/thumbnail?id=1--O7SGOhn1Z-wY6iUq_zivXYmxTbkCse&sz=w800"
   },
   {
+    "id": "prod-71",
     "name": "Red jasper",
-    "category": "Crystals & Stones",
+    "category": "Vastu Remedies",
     "b2b": 500,
     "b2c": 800,
-    "variants": []
+    "variants": [],
+    "imageId": null,
+    "image": "/sacred_remedies.png"
   },
   {
+    "id": "prod-72",
     "name": "Lapis lazuli",
-    "category": "Crystals & Stones",
+    "category": "Vastu Remedies",
     "b2b": null,
     "b2c": null,
     "variants": [
@@ -935,18 +1152,24 @@ export const productCatalog: CatalogProduct[] = [
         "b2b": null,
         "b2c": null
       }
-    ]
+    ],
+    "imageId": null,
+    "image": "/sacred_remedies.png"
   },
   {
+    "id": "prod-73",
     "name": "All stone tumbles",
-    "category": "Crystals & Stones",
+    "category": "Vastu Remedies",
     "b2b": "Rate in 200g.",
     "b2c": null,
-    "variants": []
+    "variants": [],
+    "imageId": "1g0kn631M_L9lDxLhpaGC1LQbzPKUTfLn",
+    "image": "https://drive.google.com/thumbnail?id=1g0kn631M_L9lDxLhpaGC1LQbzPKUTfLn&sz=w800"
   },
   {
+    "id": "prod-74",
     "name": "Citrine",
-    "category": "Crystals & Stones",
+    "category": "Vastu Remedies",
     "b2b": null,
     "b2c": null,
     "variants": [
@@ -1030,109 +1253,154 @@ export const productCatalog: CatalogProduct[] = [
         "b2b": null,
         "b2c": null
       }
-    ]
+    ],
+    "imageId": "1Ml0LxW2bVqHOvqGvHvEBwpl4bUx0WNI_",
+    "image": "https://drive.google.com/thumbnail?id=1Ml0LxW2bVqHOvqGvHvEBwpl4bUx0WNI_&sz=w800"
   },
   {
+    "id": "prod-75",
     "name": "All stone chips",
-    "category": "Crystals & Stones",
+    "category": "Vastu Remedies",
     "b2b": "rate in kg",
     "b2c": null,
-    "variants": []
+    "variants": [],
+    "imageId": "1g0kn631M_L9lDxLhpaGC1LQbzPKUTfLn",
+    "image": "https://drive.google.com/thumbnail?id=1g0kn631M_L9lDxLhpaGC1LQbzPKUTfLn&sz=w800"
   },
   {
+    "id": "prod-76",
     "name": "Citrine",
-    "category": "Crystals & Stones",
+    "category": "Vastu Remedies",
     "b2b": 1250,
     "b2c": 1500,
-    "variants": []
+    "variants": [],
+    "imageId": "1Ml0LxW2bVqHOvqGvHvEBwpl4bUx0WNI_",
+    "image": "https://drive.google.com/thumbnail?id=1Ml0LxW2bVqHOvqGvHvEBwpl4bUx0WNI_&sz=w800"
   },
   {
+    "id": "prod-77",
     "name": "Amethyst",
-    "category": "Crystals & Stones",
+    "category": "Vastu Remedies",
     "b2b": 600,
     "b2c": 800,
-    "variants": []
+    "variants": [],
+    "imageId": "1--O7SGOhn1Z-wY6iUq_zivXYmxTbkCse",
+    "image": "https://drive.google.com/thumbnail?id=1--O7SGOhn1Z-wY6iUq_zivXYmxTbkCse&sz=w800"
   },
   {
+    "id": "prod-78",
     "name": "Red jasper",
-    "category": "Crystals & Stones",
+    "category": "Vastu Remedies",
     "b2b": 420,
     "b2c": 600,
-    "variants": []
+    "variants": [],
+    "imageId": null,
+    "image": "/sacred_remedies.png"
   },
   {
+    "id": "prod-79",
     "name": "Lapis lazuli",
-    "category": "Crystals & Stones",
+    "category": "Vastu Remedies",
     "b2b": 650,
     "b2c": 800,
-    "variants": []
+    "variants": [],
+    "imageId": null,
+    "image": "/sacred_remedies.png"
   },
   {
+    "id": "prod-80",
     "name": "Clear quartz",
-    "category": "Crystals & Stones",
+    "category": "Vastu Remedies",
     "b2b": 550,
     "b2c": 750,
-    "variants": []
+    "variants": [],
+    "imageId": "1hkV46bi78XCjQfeGyquJ92fTlgW3LxTq",
+    "image": "https://drive.google.com/thumbnail?id=1hkV46bi78XCjQfeGyquJ92fTlgW3LxTq&sz=w800"
   },
   {
+    "id": "prod-81",
     "name": "yellow aventurine",
-    "category": "Crystals & Stones",
+    "category": "Vastu Remedies",
     "b2b": 450,
     "b2c": 650,
-    "variants": []
+    "variants": [],
+    "imageId": "19t9ziv4Nzc7HPDJt2LKbKH2FQUpwqGfW",
+    "image": "https://drive.google.com/thumbnail?id=19t9ziv4Nzc7HPDJt2LKbKH2FQUpwqGfW&sz=w800"
   },
   {
+    "id": "prod-82",
     "name": "Green aventurine",
-    "category": "Crystals & Stones",
+    "category": "Vastu Remedies",
     "b2b": 450,
     "b2c": 650,
-    "variants": []
+    "variants": [],
+    "imageId": "1LyUuQL3u3itqUoGf7qxis2W-RVOk4Klg",
+    "image": "https://drive.google.com/thumbnail?id=1LyUuQL3u3itqUoGf7qxis2W-RVOk4Klg&sz=w800"
   },
   {
+    "id": "prod-83",
     "name": "Gray aventurine",
-    "category": "Crystals & Stones",
+    "category": "Vastu Remedies",
     "b2b": 450,
     "b2c": 650,
-    "variants": []
+    "variants": [],
+    "imageId": "1LyUuQL3u3itqUoGf7qxis2W-RVOk4Klg",
+    "image": "https://drive.google.com/thumbnail?id=1LyUuQL3u3itqUoGf7qxis2W-RVOk4Klg&sz=w800"
   },
   {
+    "id": "prod-84",
     "name": "Rose quartz",
-    "category": "Crystals & Stones",
+    "category": "Vastu Remedies",
     "b2b": 550,
     "b2c": 750,
-    "variants": []
+    "variants": [],
+    "imageId": "1w14QsjrvBJWD91aWOb1VpsofbT_CF6GD",
+    "image": "https://drive.google.com/thumbnail?id=1w14QsjrvBJWD91aWOb1VpsofbT_CF6GD&sz=w800"
   },
   {
+    "id": "prod-85",
     "name": "Tiger eye",
-    "category": "Crystals & Stones",
+    "category": "Vastu Remedies",
     "b2b": 580,
     "b2c": 800,
-    "variants": []
+    "variants": [],
+    "imageId": "1UFzdi7T5ZVAtdx2bHbeU026bF_mgUXRe",
+    "image": "https://drive.google.com/thumbnail?id=1UFzdi7T5ZVAtdx2bHbeU026bF_mgUXRe&sz=w800"
   },
   {
+    "id": "prod-86",
     "name": "rainbow moonstone",
-    "category": "Crystals & Stones",
+    "category": "Vastu Remedies",
     "b2b": 650,
     "b2c": 800,
-    "variants": []
+    "variants": [],
+    "imageId": null,
+    "image": "/sacred_remedies.png"
   },
   {
+    "id": "prod-87",
     "name": "red carnelian",
-    "category": "Crystals & Stones",
+    "category": "Vastu Remedies",
     "b2b": 500,
     "b2c": 750,
-    "variants": []
+    "variants": [],
+    "imageId": "1_ZWVyoaFstNZfZVNdtEtmETrWN8oZ0Dm",
+    "image": "https://drive.google.com/thumbnail?id=1_ZWVyoaFstNZfZVNdtEtmETrWN8oZ0Dm&sz=w800"
   },
   {
+    "id": "prod-88",
     "name": "black tourmaline",
-    "category": "Crystals & Stones",
+    "category": "Vastu Remedies",
     "b2b": 580,
     "b2c": 800,
-    "variants": []
+    "variants": [],
+    "imageId": "1lPQ4gxAUIXo9GEv25faQiJcq7JXyApCD",
+    "image": "https://drive.google.com/thumbnail?id=1lPQ4gxAUIXo9GEv25faQiJcq7JXyApCD&sz=w800"
   },
   {
+    "id": "prod-89",
     "name": "All stone tree",
-    "category": "Crystals & Stones",
+    "category": "Vastu Remedies",
     "b2b": null,
     "b2c": null,
     "variants": [
@@ -1186,46 +1454,64 @@ export const productCatalog: CatalogProduct[] = [
         "b2b": null,
         "b2c": null
       }
-    ]
+    ],
+    "imageId": "1g0kn631M_L9lDxLhpaGC1LQbzPKUTfLn",
+    "image": "https://drive.google.com/thumbnail?id=1g0kn631M_L9lDxLhpaGC1LQbzPKUTfLn&sz=w800"
   },
   {
+    "id": "prod-90",
     "name": "Seven chakrash",
-    "category": "Swastika / Chakra",
+    "category": "Vastu Remedies",
     "b2b": 420,
     "b2c": 750,
-    "variants": []
+    "variants": [],
+    "imageId": null,
+    "image": "/sacred_remedies.png"
   },
   {
+    "id": "prod-91",
     "name": "red carnelian",
-    "category": "Crystals & Stones",
+    "category": "Vastu Remedies",
     "b2b": 470,
     "b2c": 800,
-    "variants": []
+    "variants": [],
+    "imageId": "1_ZWVyoaFstNZfZVNdtEtmETrWN8oZ0Dm",
+    "image": "https://drive.google.com/thumbnail?id=1_ZWVyoaFstNZfZVNdtEtmETrWN8oZ0Dm&sz=w800"
   },
   {
+    "id": "prod-92",
     "name": "black tourmaline",
-    "category": "Crystals & Stones",
+    "category": "Vastu Remedies",
     "b2b": null,
     "b2c": null,
-    "variants": []
+    "variants": [],
+    "imageId": "1lPQ4gxAUIXo9GEv25faQiJcq7JXyApCD",
+    "image": "https://drive.google.com/thumbnail?id=1lPQ4gxAUIXo9GEv25faQiJcq7JXyApCD&sz=w800"
   },
   {
+    "id": "prod-93",
     "name": "Greene zibu coins",
-    "category": "Other Vastu Products",
+    "category": "Vastu Remedies",
     "b2b": 100,
     "b2c": 150,
-    "variants": []
+    "variants": [],
+    "imageId": null,
+    "image": "/sacred_remedies.png"
   },
   {
+    "id": "prod-94",
     "name": "Selenite plate",
-    "category": "Crystals & Stones",
+    "category": "Vastu Remedies",
     "b2b": 300,
     "b2c": 350,
-    "variants": []
+    "variants": [],
+    "imageId": "1Uqsi4mNKb0vLgK11J0VD06_bzY1siiep",
+    "image": "https://drive.google.com/thumbnail?id=1Uqsi4mNKb0vLgK11J0VD06_bzY1siiep&sz=w800"
   },
   {
+    "id": "prod-95",
     "name": "All stone pyramid",
-    "category": "Pyramids",
+    "category": "Vastu Remedies",
     "b2b": null,
     "b2c": null,
     "variants": [
@@ -1234,25 +1520,34 @@ export const productCatalog: CatalogProduct[] = [
         "b2b": 410,
         "b2c": 480
       }
-    ]
+    ],
+    "imageId": "1g0kn631M_L9lDxLhpaGC1LQbzPKUTfLn",
+    "image": "https://drive.google.com/thumbnail?id=1g0kn631M_L9lDxLhpaGC1LQbzPKUTfLn&sz=w800"
   },
   {
+    "id": "prod-96",
     "name": "Pyrite plate",
-    "category": "Crystals & Stones",
+    "category": "Vastu Remedies",
     "b2b": 550,
     "b2c": 650,
-    "variants": []
+    "variants": [],
+    "imageId": "1DfyyXTUT2x5hpz73kT4VBwFZEmnLvYSc",
+    "image": "https://drive.google.com/thumbnail?id=1DfyyXTUT2x5hpz73kT4VBwFZEmnLvYSc&sz=w800"
   },
   {
+    "id": "prod-97",
     "name": "Stone bracelet",
-    "category": "Crystals & Stones",
+    "category": "Stone Bracelets",
     "b2b": null,
     "b2c": null,
-    "variants": []
+    "variants": [],
+    "imageId": "1hf5d525TjzuAwADjiyfEnCqi8TFB7eFa",
+    "image": "https://drive.google.com/thumbnail?id=1hf5d525TjzuAwADjiyfEnCqi8TFB7eFa&sz=w800"
   },
   {
+    "id": "prod-98",
     "name": "All stone mala",
-    "category": "Crystals & Stones",
+    "category": "Vastu Remedies",
     "b2b": null,
     "b2c": null,
     "variants": [
@@ -1261,32 +1556,44 @@ export const productCatalog: CatalogProduct[] = [
         "b2b": null,
         "b2c": null
       }
-    ]
+    ],
+    "imageId": "1g0kn631M_L9lDxLhpaGC1LQbzPKUTfLn",
+    "image": "https://drive.google.com/thumbnail?id=1g0kn631M_L9lDxLhpaGC1LQbzPKUTfLn&sz=w800"
   },
   {
+    "id": "prod-99",
     "name": "Bagua mirror",
-    "category": "Other Vastu Products",
+    "category": "Vastu Remedies",
     "b2b": 220,
     "b2c": 300,
-    "variants": []
+    "variants": [],
+    "imageId": null,
+    "image": "/sacred_remedies.png"
   },
   {
+    "id": "prod-100",
     "name": "Ashok stambh",
-    "category": "Decorative Items",
+    "category": "Vastu Statue",
     "b2b": null,
     "b2c": null,
-    "variants": []
+    "variants": [],
+    "imageId": "1MjKC88ln4xyh1toLiUZBrf6uvnXep31n",
+    "image": "https://drive.google.com/thumbnail?id=1MjKC88ln4xyh1toLiUZBrf6uvnXep31n&sz=w800"
   },
   {
+    "id": "prod-101",
     "name": "Vastu colour spring",
-    "category": "Other Vastu Products",
+    "category": "Vastu Remedies",
     "b2b": 40,
     "b2c": 45,
-    "variants": []
+    "variants": [],
+    "imageId": "1gGSwK1vYQPf6N4X03OhNg8BuJIFlZr65",
+    "image": "https://drive.google.com/thumbnail?id=1gGSwK1vYQPf6N4X03OhNg8BuJIFlZr65&sz=w800"
   },
   {
+    "id": "prod-102",
     "name": "Vastu metal spring",
-    "category": "Other Vastu Products",
+    "category": "Vastu Remedies",
     "b2b": null,
     "b2c": null,
     "variants": [
@@ -1315,25 +1622,34 @@ export const productCatalog: CatalogProduct[] = [
         "b2b": 55,
         "b2c": 65
       }
-    ]
+    ],
+    "imageId": null,
+    "image": "/sacred_remedies.png"
   },
   {
+    "id": "prod-103",
     "name": "Vastu purusha",
-    "category": "Other Vastu Products",
+    "category": "Vastu Remedies",
     "b2b": 320,
     "b2c": 420,
-    "variants": []
+    "variants": [],
+    "imageId": "1svq-sBjOemG2lmdcOZLtKw8YUYvlVKQO",
+    "image": "https://drive.google.com/thumbnail?id=1svq-sBjOemG2lmdcOZLtKw8YUYvlVKQO&sz=w800"
   },
   {
+    "id": "prod-104",
     "name": "Bram Nabhi",
-    "category": "Other Vastu Products",
+    "category": "Vastu Remedies",
     "b2b": null,
     "b2c": null,
-    "variants": []
+    "variants": [],
+    "imageId": "1zNC9ZtkuSQ4A_TpFMWLHBzlqKvXxJKos",
+    "image": "https://drive.google.com/thumbnail?id=1zNC9ZtkuSQ4A_TpFMWLHBzlqKvXxJKos&sz=w800"
   },
   {
+    "id": "prod-105",
     "name": "All gemstones",
-    "category": "Crystals & Stones",
+    "category": "Gem Stone",
     "b2b": null,
     "b2c": null,
     "variants": [
@@ -1342,27 +1658,43 @@ export const productCatalog: CatalogProduct[] = [
         "b2b": null,
         "b2c": null
       }
-    ]
+    ],
+    "imageId": "1RmZcCrLBh3iZuHXVEFIsDn_1Kjey5qU4_gem",
+    "image": "https://drive.google.com/thumbnail?id=1RmZcCrLBh3iZuHXVEFIsDn_1Kjey5qU4_gem&sz=w800"
   },
   {
+    "id": "prod-106",
     "name": "Vastu Devta’s divs",
-    "category": "Other Vastu Products",
+    "category": "Vastu Remedies",
     "b2b": 250,
     "b2c": 350,
-    "variants": []
+    "variants": [],
+    "imageId": "1aS_o67hDiX7dJ0u3Ujo4tRNWZDbaOI1r",
+    "image": "https://drive.google.com/thumbnail?id=1aS_o67hDiX7dJ0u3Ujo4tRNWZDbaOI1r&sz=w800"
   },
   {
+    "id": "prod-107",
     "name": "California sage",
-    "category": "Other Vastu Products",
+    "category": "Vastu Remedies",
     "b2b": null,
     "b2c": null,
-    "variants": []
+    "variants": [],
+    "imageId": null,
+    "image": "/sacred_remedies.png"
   }
 ];
 
 export function getProductByName(name: string): CatalogProduct | undefined {
   const norm = name.toLowerCase().replace(/\s+/g, '');
   return productCatalog.find(p => p.name.toLowerCase().replace(/\s+/g, '') === norm);
+}
+
+export function getProductsByCategory(categoryName: string): CatalogProduct[] {
+  const norm = categoryName.toLowerCase().replace(/[-_\s]/g, '');
+  return productCatalog.filter(p => {
+    const pNorm = p.category.toLowerCase().replace(/[-_\s]/g, '');
+    return pNorm === norm || pNorm.includes(norm) || norm.includes(pNorm);
+  });
 }
 
 export function getPriceForVariant(productName: string, variantOption?: string): { b2c: number | string | null; b2b: number | string | null } {
@@ -1524,7 +1856,6 @@ export function getEducationalInfo(productName: string, category: string): Produ
     };
   }
 
-  // General fallback
   return {
     whatIsIt: `Authentic Vastu remedy curated for energetic space alignment and prosperity in ${category}.`,
     whyUsed: "Assists in transmuting stagnant or negative environmental energies into harmonious life-force frequencies.",

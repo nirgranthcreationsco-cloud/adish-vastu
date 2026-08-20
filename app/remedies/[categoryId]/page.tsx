@@ -6,7 +6,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import FloatingCart from "../../components/floatingcart";
 import { useCart } from "../../context/cartcontext";
-import { productCatalog, CatalogProduct, matchDriveItemToCatalog, getProductStatus, ProductStatus } from "@/app/data/productCatalog";
+import { productCatalog, CatalogProduct, matchDriveItemToCatalog, getProductStatus, ProductStatus, getProductsByCategory } from "@/app/data/productCatalog";
 import ProductEnquiryModal from "../../components/productenquirymodal";
 import ProductDetailModal from "../../components/productdetailmodal";
 import HomeEnergyScoreModal from "../../components/homeenergyscoremodal";
@@ -69,71 +69,104 @@ export default function CategoryPage() {
       setLoading(true);
       setError(null);
 
-      // Fetch the main folder to get category folders
+      // Fetch category folders from drive API
       const mainResponse = await fetch('/api/drive');
       const mainData = await mainResponse.json();
 
-      if (!mainData.success) {
-        throw new Error(mainData.error);
+      let driveItems: DriveItem[] = [];
+
+      if (mainData.success && mainData.items) {
+        // Store all category folders for quick switching
+        const catFolders = mainData.items
+          .filter((item: DriveItem) => item.mimeType === 'application/vnd.google-apps.folder')
+          .map((item: DriveItem) => ({ id: item.id, name: item.name }));
+        setAllCategories(catFolders);
+
+        // Find the matching category folder
+        const categoryFolder = mainData.items.find(
+          (item: DriveItem) =>
+            item.mimeType === 'application/vnd.google-apps.folder' &&
+            item.name.toLowerCase() === categoryName.toLowerCase()
+        );
+
+        if (categoryFolder) {
+          // Fetch products from this category folder
+          const productsResponse = await fetch(`/api/drive?folderId=${categoryFolder.id}`);
+          const productsData = await productsResponse.json();
+          if (productsData.success && productsData.items) {
+            driveItems = productsData.items;
+          }
+        }
       }
 
-      // Store all category folders for quick switching
-      const catFolders = (mainData.items || [])
-        .filter((item: DriveItem) => item.mimeType === 'application/vnd.google-apps.folder')
-        .map((item: DriveItem) => ({ id: item.id, name: item.name }));
-      setAllCategories(catFolders);
-
-      // Find the matching category folder
-      const categoryFolder = mainData.items.find(
-        (item: DriveItem) =>
-          item.mimeType === 'application/vnd.google-apps.folder' &&
-          item.name.toLowerCase() === categoryName.toLowerCase()
-      );
-
-      if (!categoryFolder) {
-        throw new Error('Category not found');
-      }
-
-      // Fetch products from this category folder
-      const productsResponse = await fetch(`/api/drive?folderId=${categoryFolder.id}`);
-      const productsData = await productsResponse.json();
-
-      if (!productsData.success) {
-        throw new Error(productsData.error);
-      }
-
-      // Common image extensions
+      // Filter drive items to only valid images
       const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.bmp', '.svg', '.heic', '.heif'];
-      
-      const transformedProducts: Product[] = productsData.items
-        .filter((item: DriveItem) => {
-          const fileName = item.name.toLowerCase();
-          const isImage = imageExtensions.some(ext => fileName.endsWith(ext)) || 
-                         item.mimeType.startsWith('image/');
-          return isImage;
-        })
-        .map((item: DriveItem) => {
-          const imageUrl = `https://drive.google.com/thumbnail?id=${item.id}&sz=w800`;
-          const baseName = item.name.replace(/\.[^/.]+$/, '').trim();
-          
-          // Match Drive item with structured catalog
-          const match = matchDriveItemToCatalog(baseName);
+      const driveImages = driveItems.filter((item: DriveItem) => {
+        const fileName = item.name.toLowerCase();
+        return imageExtensions.some(ext => fileName.endsWith(ext)) || item.mimeType.startsWith('image/');
+      });
 
-          return {
-            id: item.id,
-            name: match.product ? match.product.name : baseName,
-            image: imageUrl,
-            price: "", // Will be formatted dynamically
-            category: categoryName,
-            catalogItem: match.product || undefined,
-          };
+      // 1. Get all Excel Master Catalog products belonging to this category
+      const catalogProductsForCategory = getProductsByCategory(categoryName);
+      
+      const reconciledMap = new Map<string, Product>();
+
+      // First, map every master Excel catalog product to ensure 100% presence
+      catalogProductsForCategory.forEach((catProd, idx) => {
+        reconciledMap.set(catProd.name.toLowerCase(), {
+          id: catProd.id || `cat-prod-${idx}`,
+          name: catProd.name,
+          image: catProd.image || "/sacred_remedies.png",
+          price: "",
+          category: categoryName,
+          catalogItem: catProd,
         });
+      });
 
-      setProducts(transformedProducts);
-      
+      // Second, overlay Drive images & items into the catalog
+      driveImages.forEach((item: DriveItem) => {
+        const baseName = item.name.replace(/\.[^/.]+$/, '').trim();
+        const match = matchDriveItemToCatalog(baseName);
+        const imageUrl = `https://drive.google.com/thumbnail?id=${item.id}&sz=w800`;
+
+        if (match.product) {
+          const key = match.product.name.toLowerCase();
+          const existing = reconciledMap.get(key);
+          if (existing) {
+            existing.image = imageUrl;
+            existing.id = item.id;
+          } else {
+            reconciledMap.set(key, {
+              id: item.id,
+              name: match.product.name,
+              image: imageUrl,
+              price: "",
+              category: categoryName,
+              catalogItem: match.product,
+            });
+          }
+        } else {
+          // Additional Drive item not in structured list
+          const key = baseName.toLowerCase();
+          if (!reconciledMap.has(key)) {
+            reconciledMap.set(key, {
+              id: item.id,
+              name: baseName,
+              image: imageUrl,
+              price: "",
+              category: categoryName,
+              catalogItem: undefined,
+            });
+          }
+        }
+      });
+
+      const finalProductList = Array.from(reconciledMap.values());
+      setProducts(finalProductList);
+
       // Initialize selected variants with first option
       const initialVariants: Record<string, string> = {};
-      transformedProducts.forEach(p => {
+      finalProductList.forEach(p => {
         if (p.catalogItem && p.catalogItem.variants.length > 0) {
           initialVariants[p.id] = p.catalogItem.variants[0].option;
         }
