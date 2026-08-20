@@ -229,9 +229,16 @@ export default function CategoryPage() {
     });
   };
 
-  const filteredProducts = products.filter((product) =>
-    product.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredProducts = products.filter((product) => {
+    const q = searchQuery.toLowerCase().trim();
+    if (!q) return true;
+    const nameMatch = product.name.toLowerCase().includes(q);
+    const catMatch = product.category.toLowerCase().includes(q);
+    const variantMatch = Boolean(
+      product.catalogItem?.variants.some(v => v.option.toLowerCase().includes(q))
+    );
+    return nameMatch || catMatch || variantMatch;
+  });
 
   // SEO schemas definition
   const itemListSchema = {
