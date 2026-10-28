@@ -37,6 +37,7 @@ export default function CategoryPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const [availabilityFilter, setAvailabilityFilter] = useState<"all" | "priced" | "enquire">("all");
   const [selectedVariants, setSelectedVariants] = useState<Record<string, string>>({});
   const [imageErrors, setImageErrors] = useState<Record<string, boolean>>({});
 
@@ -134,10 +135,9 @@ export default function CategoryPage() {
           const existing = reconciledMap.get(key);
           if (existing) {
             existing.image = imageUrl;
-            existing.id = item.id;
           } else {
             reconciledMap.set(key, {
-              id: item.id,
+              id: match.product.id || item.id,
               name: match.product.name,
               image: imageUrl,
               price: "",
@@ -229,7 +229,20 @@ export default function CategoryPage() {
     });
   };
 
+  const pricedCount = products.filter(p => {
+    const curVar = selectedVariants[p.id];
+    return getProductStatus(p.catalogItem, curVar) === "DIRECT_PURCHASE";
+  }).length;
+  const enquireCount = products.length - pricedCount;
+
   const filteredProducts = products.filter((product) => {
+    const currentVariant = selectedVariants[product.id];
+    const status: ProductStatus = getProductStatus(product.catalogItem, currentVariant);
+    const isPriced = status === "DIRECT_PURCHASE";
+
+    if (availabilityFilter === "priced" && !isPriced) return false;
+    if (availabilityFilter === "enquire" && isPriced) return false;
+
     const q = searchQuery.toLowerCase().trim();
     if (!q) return true;
     const nameMatch = product.name.toLowerCase().includes(q);
@@ -399,7 +412,7 @@ export default function CategoryPage() {
         </div>
 
         {/* Real-time Search Bar */}
-        <div className="max-w-md mx-auto mb-10 sm:mb-12 relative group">
+        <div className="max-w-md mx-auto mb-6 relative group">
           <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
             <Search className="h-5 w-5 text-amber-600 transition-colors group-focus-within:text-amber-500" />
           </div>
@@ -410,6 +423,59 @@ export default function CategoryPage() {
             onChange={(e) => setSearchQuery(e.target.value)}
             className="block w-full pl-12 pr-4 py-3.5 bg-amber-50/30 border-2 border-amber-200/80 rounded-2xl text-slate-800 font-bold placeholder:text-slate-400 outline-none focus:border-amber-500 focus:bg-white focus:shadow-[0_15px_30px_-10px_rgba(245,158,11,0.2)] transition-all duration-300 shadow-sm text-sm sm:text-base"
           />
+        </div>
+
+        {/* Availability / Purchase Mode Filter Tabs */}
+        <div className="flex items-center justify-center gap-2 mb-10 overflow-x-auto pb-1 scrollbar-none">
+          <button
+            onClick={() => setAvailabilityFilter("all")}
+            className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-black transition-all border flex items-center gap-1.5 ${
+              availabilityFilter === "all"
+                ? "bg-gradient-to-r from-amber-500 to-orange-500 text-white border-amber-500 shadow-md scale-105"
+                : "bg-white text-slate-700 hover:bg-amber-50 border-amber-200/80"
+            }`}
+          >
+            <span>All Items</span>
+            <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-bold ${
+              availabilityFilter === "all" ? "bg-white/20 text-white" : "bg-amber-100 text-amber-900"
+            }`}>
+              {products.length}
+            </span>
+          </button>
+
+          <button
+            onClick={() => setAvailabilityFilter("priced")}
+            className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-black transition-all border flex items-center gap-1.5 ${
+              availabilityFilter === "priced"
+                ? "bg-gradient-to-r from-emerald-600 to-teal-600 text-white border-emerald-600 shadow-md scale-105"
+                : "bg-white text-slate-700 hover:bg-emerald-50 border-emerald-200"
+            }`}
+          >
+            <ShoppingCart className="w-3.5 h-3.5 text-emerald-300" />
+            <span>Instant Buy</span>
+            <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-bold ${
+              availabilityFilter === "priced" ? "bg-white/20 text-white" : "bg-emerald-100 text-emerald-900"
+            }`}>
+              {pricedCount}
+            </span>
+          </button>
+
+          <button
+            onClick={() => setAvailabilityFilter("enquire")}
+            className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-black transition-all border flex items-center gap-1.5 ${
+              availabilityFilter === "enquire"
+                ? "bg-gradient-to-r from-amber-600 to-amber-700 text-white border-amber-600 shadow-md scale-105"
+                : "bg-white text-slate-700 hover:bg-amber-50 border-amber-200"
+            }`}
+          >
+            <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+            <span>Consultation & Custom</span>
+            <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-bold ${
+              availabilityFilter === "enquire" ? "bg-white/20 text-white" : "bg-amber-100 text-amber-900"
+            }`}>
+              {enquireCount}
+            </span>
+          </button>
         </div>
 
         {/* Products Grid (2 Columns on Mobile, 3/4 Columns on Desktop) */}

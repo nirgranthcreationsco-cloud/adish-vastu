@@ -1,7 +1,6 @@
 "use client";
 
 import AuthenticityGuaranteeSection from "@/app/components/authenticity";
-import CoursesSection from "@/app/components/course";
 import FinalCTASection from "@/app/components/final";
 import FloatingCart from "@/app/components/floatingcart";
 import HeroSection from "@/app/components/herosection";
@@ -17,7 +16,6 @@ export default function Page() {
       <HeroSection />
       <WhyOneMasterSection />
       <ServicesSection />
-      <CoursesSection />
       <RemediesSection />
       <AuthenticityGuaranteeSection />
       <TransformationStories />
