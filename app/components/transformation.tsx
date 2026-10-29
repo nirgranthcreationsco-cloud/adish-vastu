@@ -131,7 +131,7 @@ export default function TransformationStories() {
                 </div>
 
                 <blockquote className="border-l-4 border-amber-400 pl-4 text-slate-700 italic text-sm md:text-lg">
-                  "{s.quote}"
+                  &ldquo;{s.quote}&rdquo;
                 </blockquote>
 
                 <button 

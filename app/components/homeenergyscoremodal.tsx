@@ -452,7 +452,7 @@ export default function HomeEnergyScoreModal({
               Report Unlocked!
             </h3>
             <p className="text-lg text-slate-600">
-              We'll send your personalized correction summary shortly.
+              We&apos;ll send your personalized correction summary shortly.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">

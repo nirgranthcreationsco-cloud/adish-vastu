@@ -14,9 +14,17 @@ export default function HeroSection() {
   const router = useRouter();
   const [isVisible, setIsVisible] = useState(false);
   const [energyScoreOpen, setEnergyScoreOpen] = useState(false);
+  const [particles, setParticles] = useState<Array<{ left: string; top: string; delay: string; duration: string }>>([]);
 
   useEffect(() => {
     setIsVisible(true);
+    const generated = Array.from({ length: 20 }, () => ({
+      left: `${Math.random() * 100}%`,
+      top: `${Math.random() * 100}%`,
+      delay: `${Math.random() * 5}s`,
+      duration: `${5 + Math.random() * 5}s`,
+    }));
+    setParticles(generated);
   }, []);
 
   return (
@@ -80,15 +88,15 @@ export default function HeroSection() {
         )}
 
         {/* Floating particles */}
-        {isVisible && [...Array(20)].map((_, i) => (
+        {isVisible && particles.map((p, i) => (
           <div
             key={i}
             className="absolute w-1 h-1 bg-amber-400 rounded-full animate-float"
             style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-              animationDelay: `${Math.random() * 5}s`,
-              animationDuration: `${5 + Math.random() * 5}s`,
+              left: p.left,
+              top: p.top,
+              animationDelay: p.delay,
+              animationDuration: p.duration,
             }}
           />
         ))}

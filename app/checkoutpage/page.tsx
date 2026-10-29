@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  ArrowLeft,
   CheckCircle2,
   ChevronRight,
   Lock,
@@ -277,11 +278,22 @@ export default function CheckoutPage() {
         <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-orange-100 rounded-full blur-[120px] opacity-40" />
       </div>
 
-      <div className="relative z-10 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="relative z-10 pt-16 pb-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
 
+          {/* Top Navigation Anchor */}
+          <div className="mb-6">
+            <button
+              onClick={() => router.push("/#remedies")}
+              className="flex items-center gap-2 text-slate-600 hover:text-amber-700 font-bold text-sm transition-colors"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              <span>Continue Shopping Remedies</span>
+            </button>
+          </div>
+
           {/* PROGRESS STEPS - MINI */}
-          <div className="mb-10 flex items-center justify-center gap-4 text-xs font-bold tracking-widest uppercase text-slate-400">
+          <div className="mb-8 flex items-center justify-center gap-4 text-xs font-bold tracking-widest uppercase text-slate-400">
             <span className="text-amber-600">Cart</span>
             <ChevronRight className="w-3 h-3" />
             <span className="text-slate-900 px-3 py-1 bg-white border border-slate-200 rounded-full shadow-sm">Checkout</span>

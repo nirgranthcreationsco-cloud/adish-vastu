@@ -22,13 +22,6 @@ export default function LocaleProvider({ children }: { children: ReactNode }) {
   const [locale, setLocale] = useState('en');
   const [messages, setMessages] = useState<any>(enMessages); // Default to statically imported English
 
-  useEffect(() => {
-    // Load locale from localStorage
-    const savedLocale = localStorage.getItem('locale') || 'en';
-    setLocale(savedLocale);
-    loadMessages(savedLocale);
-  }, []);
-
   const loadMessages = (loc: string) => {
     if (loc === 'hi') {
       setMessages(hiMessages);
@@ -36,6 +29,13 @@ export default function LocaleProvider({ children }: { children: ReactNode }) {
       setMessages(enMessages);
     }
   };
+
+  useEffect(() => {
+    // Load locale from localStorage
+    const savedLocale = localStorage.getItem('locale') || 'en';
+    setLocale(savedLocale);
+    loadMessages(savedLocale);
+  }, []);
 
   const switchLocale = (newLocale: string) => {
     setLocale(newLocale);
