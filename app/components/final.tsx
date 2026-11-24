@@ -2,17 +2,17 @@
 
 import { supabase } from "@/supabase";
 import {
-    CheckCircle2,
-    ChevronRight,
-    Facebook,
-    Instagram,
-    Mail,
-    MapPin,
-    Phone,
-    Send,
-    Sparkles,
-    X,
-    Youtube,
+  CheckCircle2,
+  ChevronRight,
+  Facebook,
+  Instagram,
+  Mail,
+  MapPin,
+  Phone,
+  Send,
+  Sparkles,
+  X,
+  Youtube,
 } from "lucide-react";
 import { useTranslations } from 'next-intl';
 import { useSearchParams } from "next/navigation";
@@ -122,24 +122,30 @@ const handleSubmit = async (e: React.MouseEvent) => {
 
   setIsSubmitting(true);
 
-  console.log("DEBUG: Attempting insert...");
+  console.log("DEBUG: Attempting insert...", {
+    name: formData.name.trim(),
+    phone: formData.phone,
+    service: formData.service,
+    message: formData.message?.trim() || null,
+  });
 
-const { error } = await supabase.from("contact_requests").insert({
-  name: formData.name.trim(),
-  phone: formData.phone,
-  service: formData.service,
-  message: formData.message?.trim() || null,
-});
+  const { data: insertData, error } = await supabase.from("contact_requests").insert({
+    name: formData.name.trim(),
+    phone: formData.phone,
+    service: formData.service,
+    message: formData.message?.trim() || null,
+  }).select();
 
-
-
-console.log("DEBUG ERROR:", error);
-
-if (error) {
-  console.error("Supabase Insert Error:", error);
-  setIsSubmitting(false);
-  return;
-}
+  if (error) {
+    console.error("Supabase Insert Error Message:", error.message);
+    console.error("Supabase Insert Error Code:", error.code);
+    console.error("Supabase Insert Error Details:", error.details);
+    console.error("Supabase Insert Error Hint:", error.hint);
+    console.error("Supabase Insert Full JSON:", JSON.stringify(error, null, 2));
+    alert(`Failed to submit: ${error.message || error.details || "Database rejected insert"}`);
+    setIsSubmitting(false);
+    return;
+  }
 
 
   setSubmitSuccess(true);
