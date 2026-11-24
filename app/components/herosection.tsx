@@ -6,11 +6,10 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import HomeEnergyScoreModal from "./homeenergyscoremodal";
-import { useLocale } from "./localeprovider";
 
 export default function HeroSection() {
-  const { locale, switchLocale } = useLocale();
   const t = useTranslations('hero');
+  const tc = useTranslations('common');
   const router = useRouter();
   const [isVisible, setIsVisible] = useState(false);
   const [energyScoreOpen, setEnergyScoreOpen] = useState(false);
@@ -27,25 +26,15 @@ export default function HeroSection() {
     setParticles(generated);
   }, []);
 
+  const scrollToProducts = () => {
+    const el = document.getElementById("remedies");
+    if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+
   return (
     <>
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+    <section className="relative flex items-center justify-center overflow-hidden pt-14 pb-8 md:pt-16 md:pb-10">
 
-      {/* Language Switcher - Only in Hero Section */}
-      <div className="absolute top-24 right-6 z-40">
-        <button
-          onClick={() => switchLocale(locale === 'en' ? 'hi' : 'en')}
-          className="px-5 py-2.5 bg-white/80 backdrop-blur-md border border-amber-200 text-amber-900 font-bold rounded-full shadow-lg hover:shadow-xl hover:scale-105 transition-all flex items-center gap-2 group"
-          aria-label="Switch Language"
-        >
-          <span className="text-xl group-hover:rotate-12 transition-transform">
-            {locale === 'en' ? '🇮🇳' : '🇬🇧'}
-          </span>
-          <span className="text-sm tracking-wide">
-            {locale === 'en' ? 'हिन्दी' : 'English'}
-          </span>
-        </button>
-      </div>
 
       {/* --- BACKGROUND LAYERS --- */}
       <div className="absolute inset-0 overflow-hidden">
@@ -103,14 +92,14 @@ export default function HeroSection() {
       </div>
 
       {/* --- CONTENT WRAPPER --- */}
-      <div className="relative z-20 max-w-7xl mx-auto px-6 py-20 w-full">
+      <div className="relative z-20 max-w-7xl mx-auto px-6 py-8 md:py-12 w-full">
 
         {/* MOBILE FIRST: IMAGE ON TOP */}
-        <div className="flex flex-col-reverse lg:grid lg:grid-cols-2 gap-12 items-center">
+        <div className="flex flex-col-reverse lg:grid lg:grid-cols-2 gap-8 lg:gap-10 items-center">
 
           {/* LEFT: TEXT */}
           <div
-            className={`text-slate-900 space-y-8 transition-all duration-1000 ${
+            className={`text-slate-900 space-y-5 transition-all duration-1000 ${
               isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
             }`}
           >
@@ -121,102 +110,103 @@ export default function HeroSection() {
             </div>
 
             {/* Heading */}
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight">
+            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight">
               {t('title')}{" "}
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-orange-400 to-amber-300 animate-gradient">
                 {t('name')}
               </span>
             </h1>
 
-            <p className="text-xl md:text-2xl text-amber-900">{t('subtitle')}</p>
+            <p className="text-lg md:text-xl text-amber-900">{t('subtitle')}</p>
 
-            <p className="text-lg text-slate-700">
+            <p className="text-base text-slate-700 line-clamp-2 md:line-clamp-none">
               {t('description')}
             </p>
 
-            {/* Buttons */}
-            <div className="flex flex-col sm:flex-row gap-4 pt-4">
-              <button 
-                onClick={() => router.push('/?service=vastu&msg=Hero%20Section%20Consultation#consultation-form')}
-                className="group px-10 py-5 bg-gradient-to-r from-amber-500 to-orange-600 text-white font-black text-sm uppercase tracking-[0.2em] rounded-2xl shadow-2xl shadow-amber-500/30 hover:scale-105 active:scale-95 transition-all flex items-center gap-3"
+            {/* Buttons — shop first, then consult */}
+            <div className="flex flex-col sm:flex-row gap-3 pt-2">
+              <button
+                onClick={scrollToProducts}
+                className="group px-8 py-4 bg-gradient-to-r from-amber-500 to-orange-600 text-white font-black text-sm uppercase tracking-[0.2em] rounded-2xl shadow-2xl shadow-amber-500/30 hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-3"
               >
-                {t('cta1')}
+                {t('shopCta')}
                 <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </button>
 
-              <button 
+              <button
+                onClick={() => router.push('/?service=vastu&msg=Hero%20Section%20Consultation#consultation-form')}
+                className="px-6 py-3.5 bg-white hover:bg-amber-50 text-amber-900 font-semibold rounded-xl border border-amber-300 transition-all hover:scale-105"
+              >
+                {t('cta1')}
+              </button>
+
+              <button
                 onClick={() => setEnergyScoreOpen(true)}
-                className="px-8 py-4 bg-white hover:bg-amber-50 text-amber-900 font-semibold rounded-lg border border-amber-300 transition-all hover:scale-105"
+                className="px-6 py-3.5 bg-white/70 hover:bg-amber-50 text-amber-900 font-semibold rounded-xl border border-amber-200 transition-all hover:scale-105"
               >
                 {t('cta2')}
               </button>
             </div>
 
             {/* Trust stats */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-8">
-              <div className="text-center p-4 bg-white/80 rounded-lg border border-amber-200 backdrop-blur-sm">
-                <Clock className="w-6 h-6 text-amber-600 mx-auto mb-2" />
-                <div className="text-lg font-bold text-amber-700">{t('stats.experience')}</div>
-                <div className="text-xs text-slate-600">{t('stats.experienceLabel')}</div>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 pt-4">
+              <div className="text-center p-3 bg-white/80 rounded-lg border border-amber-200 backdrop-blur-sm">
+                <Clock className="w-5 h-5 text-amber-600 mx-auto mb-1" />
+                <div className="text-base font-bold text-amber-700">{t('stats.experience')}</div>
+                <div className="text-[10px] text-slate-600">{t('stats.experienceLabel')}</div>
               </div>
-              <div className="text-center p-4 bg-white/80 rounded-lg border border-amber-200 backdrop-blur-sm">
-                <Users className="w-6 h-6 text-amber-600 mx-auto mb-2" />
-                <div className="text-lg font-bold text-amber-700">{t('stats.families')}</div>
-                <div className="text-xs text-slate-600">{t('stats.familiesLabel')}</div>
+              <div className="text-center p-3 bg-white/80 rounded-lg border border-amber-200 backdrop-blur-sm">
+                <Users className="w-5 h-5 text-amber-600 mx-auto mb-1" />
+                <div className="text-base font-bold text-amber-700">{t('stats.families')}</div>
+                <div className="text-[10px] text-slate-600">{t('stats.familiesLabel')}</div>
               </div>
-              <div className="text-center p-4 bg-white/80 rounded-lg border border-amber-200 backdrop-blur-sm">
-                <Award className="w-6 h-6 text-amber-600 mx-auto mb-2" />
-                <div className="text-lg font-bold text-amber-700">{t('stats.verified')}</div>
-                <div className="text-xs text-slate-600">{t('stats.verifiedLabel')}</div>
+              <div className="text-center p-3 bg-white/80 rounded-lg border border-amber-200 backdrop-blur-sm">
+                <Award className="w-5 h-5 text-amber-600 mx-auto mb-1" />
+                <div className="text-base font-bold text-amber-700">{t('stats.verified')}</div>
+                <div className="text-[10px] text-slate-600">{t('stats.verifiedLabel')}</div>
               </div>
-              <div className="text-center p-4 bg-white/80 rounded-lg border border-amber-200 backdrop-blur-sm">
-                <Star className="w-6 h-6 text-amber-600 mx-auto mb-2" />
-                <div className="text-lg font-bold text-amber-700">{t('stats.rating')}</div>
-                <div className="text-xs text-slate-600">{t('stats.ratingLabel')}</div>
+              <div className="text-center p-3 bg-white/80 rounded-lg border border-amber-200 backdrop-blur-sm">
+                <Star className="w-5 h-5 text-amber-600 mx-auto mb-1" />
+                <div className="text-base font-bold text-amber-700">{t('stats.rating')}</div>
+                <div className="text-[10px] text-slate-600">{t('stats.ratingLabel')}</div>
               </div>
             </div>
           </div>
 
-          {/* RIGHT: BIG IMAGE + MANDALA */}
+          {/* RIGHT: IMAGE */}
           <div className="relative flex items-center justify-center">
-
-            {/* Glow */}
             <div className="absolute inset-0 bg-gradient-to-r from-amber-500/30 to-orange-500/30 rounded-full blur-3xl animate-pulse" />
 
-            {/* Image size (Desktop 420px • Mobile 260px) */}
-            <div className="relative w-[260px] h-[260px] md:w-[420px] md:h-[420px] rounded-full overflow-hidden border-4 border-amber-400/40 shadow-2xl shadow-amber-500/50 hover:scale-105 transition-transform duration-700">
-              <Image 
-                src="/profile.png" 
-                alt="Jain Vastu Solutions" 
+            <div className="relative w-[200px] h-[200px] md:w-[320px] md:h-[320px] rounded-full overflow-hidden border-4 border-amber-400/40 shadow-2xl shadow-amber-500/50 hover:scale-105 transition-transform duration-700">
+              <Image
+                src="/profile.png"
+                alt="Jain Vastu Solutions"
                 fill
-                sizes="(max-width: 768px) 260px, 420px"
+                sizes="(max-width: 768px) 200px, 320px"
                 className="object-cover"
                 priority
               />
             </div>
 
-            {/* Floating Glass Badges */}
             {isVisible && (
               <>
-                {/* Top Left Badge */}
-                <div className="absolute -top-4 -left-4 md:-top-8 md:-left-8 z-30 px-4 py-2.5 bg-white/90 backdrop-blur-md border border-amber-200 rounded-2xl shadow-xl hover:scale-105 transition-all duration-300 flex items-center gap-2 animate-float">
-                  <div className="w-8 h-8 rounded-xl bg-amber-100 flex items-center justify-center text-amber-700">
-                    <Sparkles className="w-4 h-4 animate-pulse" />
+                <div className="absolute -top-2 -left-2 md:-top-4 md:-left-4 z-30 px-3 py-2 bg-white/90 backdrop-blur-md border border-amber-200 rounded-2xl shadow-xl flex items-center gap-2 animate-float">
+                  <div className="w-7 h-7 rounded-xl bg-amber-100 flex items-center justify-center text-amber-700">
+                    <Sparkles className="w-3.5 h-3.5 animate-pulse" />
                   </div>
                   <div className="text-left">
-                    <p className="text-[10px] uppercase tracking-wider text-slate-500 font-bold">Approach</p>
-                    <p className="text-xs font-black text-slate-800">100% Scientific</p>
+                    <p className="text-[9px] uppercase tracking-wider text-slate-500 font-bold">{tc('approach')}</p>
+                    <p className="text-[11px] font-black text-slate-800">{tc('scientific')}</p>
                   </div>
                 </div>
 
-                {/* Bottom Right Badge */}
-                <div className="absolute -bottom-4 -right-4 md:-bottom-8 md:-right-8 z-30 px-4 py-2.5 bg-white/90 backdrop-blur-md border border-amber-200 rounded-2xl shadow-xl hover:scale-105 transition-all duration-300 flex items-center gap-2 animate-float" style={{ animationDelay: '2s' }}>
-                  <div className="w-8 h-8 rounded-xl bg-amber-100 flex items-center justify-center text-amber-700">
-                    <Award className="w-4 h-4" />
+                <div className="absolute -bottom-2 -right-2 md:-bottom-4 md:-right-4 z-30 px-3 py-2 bg-white/90 backdrop-blur-md border border-amber-200 rounded-2xl shadow-xl flex items-center gap-2 animate-float" style={{ animationDelay: '2s' }}>
+                  <div className="w-7 h-7 rounded-xl bg-amber-100 flex items-center justify-center text-amber-700">
+                    <Award className="w-3.5 h-3.5" />
                   </div>
                   <div className="text-left">
-                    <p className="text-[10px] uppercase tracking-wider text-slate-500 font-bold">Remedies</p>
-                    <p className="text-xs font-black text-slate-800">Personally Energized</p>
+                    <p className="text-[9px] uppercase tracking-wider text-slate-500 font-bold">{tc('remedies')}</p>
+                    <p className="text-[11px] font-black text-slate-800">{tc('personallyEnergized')}</p>
                   </div>
                 </div>
               </>
@@ -225,12 +215,17 @@ export default function HeroSection() {
         </div>
       </div>
 
-      {/* Scroll Indicator */}
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-30 animate-bounce text-amber-600">
-        <div className="p-3 bg-white/50 backdrop-blur-sm rounded-full border border-amber-200">
-          <ChevronRight className="w-6 h-6 rotate-90" />
+      {/* Jump to products */}
+      <button
+        type="button"
+        onClick={scrollToProducts}
+        className="absolute bottom-3 left-1/2 -translate-x-1/2 z-30 animate-bounce text-amber-600"
+        aria-label="Scroll to products"
+      >
+        <div className="p-2 bg-white/50 backdrop-blur-sm rounded-full border border-amber-200">
+          <ChevronRight className="w-5 h-5 rotate-90" />
         </div>
-      </div>
+      </button>
 
       <style jsx>{`
         @keyframes spin-slower {

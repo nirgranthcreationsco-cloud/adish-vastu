@@ -1,81 +1,106 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #fffaf5;
+  --foreground: #1c1917;
+  --font-body: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-sans);
+  --font-hindi: var(--font-hindi);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html.locale-hi {
+  --font-body: var(--font-hindi), var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+}
+
+html.locale-en {
+  --font-body: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-sans), system-ui, -apple-system, sans-serif;
-  /* Better line-height for Devanagari script */
-  line-height: 1.65;
-}
-
-/* Fix for Hindi (Devanagari) text clipping */
-* {
-  /* Ensure text rendering doesn't clip diacritical marks */
-  text-rendering: optimizeLegibility;
+  font-family: var(--font-body);
+  font-feature-settings: "kern" 1, "liga" 1;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  line-height: 1.65;
+  letter-spacing: -0.011em;
 }
 
-/* Ensure proper spacing for text elements to prevent clipping */
+/* Hindi / Devanagari — Flipkart/Amazon-IN style readability */
+html.locale-hi body {
+  line-height: 1.8;
+  letter-spacing: 0;
+  word-spacing: 0.02em;
+}
+
+html.locale-hi h1,
+html.locale-hi h2,
+html.locale-hi h3,
+html.locale-hi h4,
+html.locale-hi h5,
+html.locale-hi h6 {
+  line-height: 1.45;
+  letter-spacing: 0;
+  font-weight: 700;
+}
+
+* {
+  text-rendering: optimizeLegibility;
+}
+
 h1,
 h2,
 h3,
 h4,
 h5,
 h6 {
-  line-height: 1.5;
-  padding-top: 0.2em;
-  padding-bottom: 0.2em;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+  font-weight: 800;
+}
+
+html.locale-en h1,
+html.locale-en h2,
+html.locale-en h3 {
+  letter-spacing: -0.025em;
 }
 
 p,
 span,
 button,
 a,
-label {
-  line-height: 1.7;
-  /* Prevent overflow clipping for text elements */
+label,
+li {
+  line-height: inherit;
   overflow: visible;
 }
 
-div {
-  line-height: 1.7;
-}
-
-/* Utility class for Hindi/Devanagari text */
 .hindi-text {
-  line-height: 1.8 !important;
-  padding-top: 0.25em !important;
-  padding-bottom: 0.25em !important;
-  overflow: visible !important;
+  font-family: var(--font-hindi), var(--font-sans), sans-serif;
+  line-height: 1.8;
+  letter-spacing: 0;
+  overflow: visible;
 }
 
-/* Removed global .flex align-items: center as it overrides Tailwind utilities */
-/* .flex,
-.inline-flex {
-  align-items: center;
-} */
+/* Ecom-like product title clamp */
+.product-title {
+  font-weight: 700;
+  line-height: 1.35;
+  letter-spacing: -0.01em;
+}
 
-/* Custom Scrollbar Styles */
+html.locale-hi .product-title {
+  letter-spacing: 0;
+  line-height: 1.5;
+}
+
 .scrollbar-thin::-webkit-scrollbar {
   width: 6px;
 }
@@ -94,7 +119,6 @@ div {
   background: #f59e0b;
 }
 
-/* Firefox scrollbar */
 .scrollbar-thin {
   scrollbar-width: thin;
   scrollbar-color: #fbbf24 #f1f5f9;

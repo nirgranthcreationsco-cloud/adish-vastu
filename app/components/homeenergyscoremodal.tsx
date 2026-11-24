@@ -2,8 +2,9 @@
 
 import { supabase } from "@/supabase";
 import { ArrowLeft, ArrowRight, CheckCircle, Loader2, X } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 type Step = "intro" | "questions" | "calculating" | "result" | "capture" | "success";
 
@@ -30,6 +31,7 @@ export default function HomeEnergyScoreModal({
   isOpen: boolean;
   onClose: () => void;
 }) {
+  const t = useTranslations("energyScore");
   const router = useRouter();
   const [step, setStep] = useState<Step>("intro");
   const [currentQuestion, setCurrentQuestion] = useState(0);
@@ -62,38 +64,70 @@ export default function HomeEnergyScoreModal({
     };
   }, [isOpen]);
 
-  const questions = [
-    {
-      key: "propertyType" as keyof Answers,
-      question: "What type of property do you live in?",
-      options: ["Flat", "Villa", "Independent House"],
-    },
-    {
-      key: "ownership" as keyof Answers,
-      question: "Do you own or rent this property?",
-      options: ["Owned", "Rented"],
-    },
-    {
-      key: "concern" as keyof Answers,
-      question: "What's your primary concern?",
-      options: ["Finance", "Peace", "Health", "Career", "Just exploring"],
-    },
-    {
-      key: "homeFeel" as keyof Answers,
-      question: "How does your home feel?",
-      options: ["Calm", "Neutral", "Heavy", "Uncertain"],
-    },
-    {
-      key: "direction" as keyof Answers,
-      question: "Main entrance direction (if known)?",
-      options: ["East", "West", "North", "South", "Not sure"],
-    },
-    {
-      key: "homeAge" as keyof Answers,
-      question: "How old is your home?",
-      options: ["New", "2–5 years", "5+ years"],
-    },
-  ];
+  // Stable English values for scoring/DB; translated labels for UI
+  const questions = useMemo(
+    () => [
+      {
+        key: "propertyType" as keyof Answers,
+        question: t("questions.q1"),
+        options: [
+          { value: "Flat", label: t("questions.q1opt1") },
+          { value: "Villa", label: t("questions.q1opt2") },
+          { value: "Independent House", label: t("questions.q1opt3") },
+        ],
+      },
+      {
+        key: "ownership" as keyof Answers,
+        question: t("questions.q2"),
+        options: [
+          { value: "Owned", label: t("questions.q2opt1") },
+          { value: "Rented", label: t("questions.q2opt2") },
+        ],
+      },
+      {
+        key: "concern" as keyof Answers,
+        question: t("questions.q3"),
+        options: [
+          { value: "Finance", label: t("questions.q3opt1") },
+          { value: "Peace", label: t("questions.q3opt2") },
+          { value: "Health", label: t("questions.q3opt3") },
+          { value: "Career", label: t("questions.q3opt4") },
+          { value: "Just exploring", label: t("questions.q3opt5") },
+        ],
+      },
+      {
+        key: "homeFeel" as keyof Answers,
+        question: t("questions.q4"),
+        options: [
+          { value: "Calm", label: t("questions.q4opt1") },
+          { value: "Neutral", label: t("questions.q4opt2") },
+          { value: "Heavy", label: t("questions.q4opt3") },
+          { value: "Uncertain", label: t("questions.q4opt4") },
+        ],
+      },
+      {
+        key: "direction" as keyof Answers,
+        question: t("questions.q5"),
+        options: [
+          { value: "East", label: t("questions.q5opt1") },
+          { value: "West", label: t("questions.q5opt2") },
+          { value: "North", label: t("questions.q5opt3") },
+          { value: "South", label: t("questions.q5opt4") },
+          { value: "Not sure", label: t("questions.q5opt5") },
+        ],
+      },
+      {
+        key: "homeAge" as keyof Answers,
+        question: t("questions.q6"),
+        options: [
+          { value: "New", label: t("questions.q6opt1") },
+          { value: "2–5 years", label: t("questions.q6opt2") },
+          { value: "5+ years", label: t("questions.q6opt3") },
+        ],
+      },
+    ],
+    [t]
+  );
 
   const calculateScore = () => {
     let calculatedScore = 100;
@@ -130,10 +164,8 @@ export default function HomeEnergyScoreModal({
 
   const handleSubmit = async () => {
     const newErrors = {
-      name: !formData.name.trim() ? "Name is required" : "",
-      phone: !/^[6-9]\d{9}$/.test(formData.phone)
-        ? "Valid 10-digit number required"
-        : "",
+      name: !formData.name.trim() ? t("capture.errName") : "",
+      phone: !/^[6-9]\d{9}$/.test(formData.phone) ? t("capture.errPhone") : "",
     };
 
     setErrors(newErrors);
@@ -194,11 +226,9 @@ export default function HomeEnergyScoreModal({
   };
 
   const getScoreMessage = () => {
-    if (score <= 40)
-      return "Your home energy needs attention. Let's fix this together.";
-    if (score <= 70)
-      return "Your home has moderate energy. Small changes can make a big difference.";
-    return "Your home has balanced energy. Let's optimize it further.";
+    if (score <= 40) return t("result.low");
+    if (score <= 70) return t("result.medium");
+    return t("result.high");
   };
 
   return (
@@ -222,16 +252,16 @@ export default function HomeEnergyScoreModal({
               <span className="text-3xl">🏠</span>
             </div>
             <h2 className="text-3xl md:text-4xl font-extrabold text-slate-900">
-              Check Your Home Energy Score™
+              {t("intro.title")}
             </h2>
             <p className="text-lg text-slate-600">
-              Free · Takes less than 60 seconds
+              {t("intro.subtitle")}
             </p>
             <button
               onClick={() => setStep("questions")}
               className="px-10 py-4 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-bold text-lg rounded-xl shadow-xl transition-all hover:scale-105 inline-flex items-center gap-2"
             >
-              Start Assessment
+              {t("intro.start")}
               <ArrowRight className="w-5 h-5" />
             </button>
           </div>
@@ -246,11 +276,11 @@ export default function HomeEnergyScoreModal({
                   className="flex items-center gap-2 text-slate-600 hover:text-slate-900 transition"
                 >
                   <ArrowLeft className="w-4 h-4" />
-                  Back
+                  {t("questions.back")}
                 </button>
               )}
               <div className="ml-auto text-sm font-semibold text-slate-600">
-                Step {currentQuestion + 1} of {questions.length}
+                {t("questions.step")} {currentQuestion + 1} {t("questions.of")} {questions.length}
               </div>
             </div>
 
@@ -270,11 +300,11 @@ export default function HomeEnergyScoreModal({
             <div className="grid gap-3 mt-6">
               {questions[currentQuestion].options.map((option) => (
                 <button
-                  key={option}
-                  onClick={() => handleAnswer(option)}
+                  key={option.value}
+                  onClick={() => handleAnswer(option.value)}
                   className="w-full p-4 text-left bg-slate-50 hover:bg-amber-50 border-2 border-slate-200 hover:border-amber-400 rounded-xl font-semibold text-slate-900 transition-all hover:scale-[1.02]"
                 >
-                  {option}
+                  {option.label}
                 </button>
               ))}
             </div>
@@ -285,16 +315,16 @@ export default function HomeEnergyScoreModal({
           <div className="p-12 md:p-16 text-center space-y-6">
             <Loader2 className="w-16 h-16 mx-auto text-amber-500 animate-spin" />
             <h3 className="text-2xl font-bold text-slate-900">
-              Analyzing energy alignment…
+              {t("calculating.title")}
             </h3>
-            <p className="text-slate-600">Evaluating directional harmony…</p>
+            <p className="text-slate-600">{t("calculating.subtitle")}</p>
           </div>
         )}
 
         {step === "result" && (
           <div className="p-8 md:p-12 text-center space-y-6">
             <h3 className="text-2xl font-bold text-slate-900">
-              Your Home Energy Score
+              {t("result.title")}
             </h3>
 
             <div className="relative w-40 h-40 mx-auto">
@@ -339,7 +369,7 @@ export default function HomeEnergyScoreModal({
               onClick={() => setStep("capture")}
               className="px-10 py-4 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-bold text-lg rounded-xl shadow-xl transition-all hover:scale-105"
             >
-              Unlock Personalized Report
+              {t("result.unlock")}
             </button>
           </div>
         )}
@@ -347,20 +377,20 @@ export default function HomeEnergyScoreModal({
         {step === "capture" && (
           <div className="p-6 md:p-10 space-y-6">
             <h3 className="text-2xl md:text-3xl font-bold text-slate-900 text-center">
-              Unlock Your Personalized Correction Summary
+              {t("capture.title")}
             </h3>
 
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-bold text-slate-900 mb-2">
-                  Full Name *
+                  {t("capture.nameLabel")}
                 </label>
                 <input
                   value={formData.name}
                   onChange={(e) =>
                     setFormData({ ...formData, name: e.target.value })
                   }
-                  placeholder="Enter your name"
+                  placeholder={t("capture.namePlaceholder")}
                   className={`w-full px-4 py-3 bg-white border-2 rounded-xl text-slate-900 placeholder-slate-400 font-medium focus:outline-none focus:ring-2 transition-all ${
                     errors.name
                       ? "border-red-500 focus:ring-red-500"
@@ -374,7 +404,7 @@ export default function HomeEnergyScoreModal({
 
               <div>
                 <label className="block text-sm font-bold text-slate-900 mb-2">
-                  Phone Number *
+                  {t("capture.phoneLabel")}
                 </label>
                 <input
                   value={formData.phone}
@@ -384,7 +414,7 @@ export default function HomeEnergyScoreModal({
                       setFormData({ ...formData, phone: digits });
                     }
                   }}
-                  placeholder="+91 98765 43210"
+                  placeholder={t("capture.phonePlaceholder")}
                   className={`w-full px-4 py-3 bg-white border-2 rounded-xl text-slate-900 placeholder-slate-400 font-medium focus:outline-none focus:ring-2 transition-all ${
                     errors.phone
                       ? "border-red-500 focus:ring-red-500"
@@ -398,21 +428,21 @@ export default function HomeEnergyScoreModal({
 
               <div>
                 <label className="block text-sm font-bold text-slate-900 mb-2">
-                  Email (Optional)
+                  {t("capture.emailLabel")}
                 </label>
                 <input
                   value={formData.email}
                   onChange={(e) =>
                     setFormData({ ...formData, email: e.target.value })
                   }
-                  placeholder="your@email.com"
+                  placeholder={t("capture.emailPlaceholder")}
                   className="w-full px-4 py-3 bg-white border-2 border-slate-300 rounded-xl text-slate-900 placeholder-slate-400 font-medium focus:outline-none focus:ring-2 focus:ring-amber-500 transition-all"
                 />
               </div>
 
               <div>
                 <label className="block text-sm font-bold text-slate-900 mb-2">
-                  Message (Optional)
+                  {t("capture.messageLabel")}
                 </label>
                 <textarea
                   value={formData.message}
@@ -420,7 +450,7 @@ export default function HomeEnergyScoreModal({
                     setFormData({ ...formData, message: e.target.value })
                   }
                   rows={3}
-                  placeholder="Any specific concerns?"
+                  placeholder={t("capture.messagePlaceholder")}
                   className="w-full px-4 py-3 bg-white border-2 border-slate-300 rounded-xl text-slate-900 placeholder-slate-400 font-medium focus:outline-none focus:ring-2 focus:ring-amber-500 transition-all resize-none"
                 />
               </div>
@@ -433,10 +463,10 @@ export default function HomeEnergyScoreModal({
                 {isSubmitting ? (
                   <>
                     <Loader2 className="w-5 h-5 animate-spin" />
-                    Unlocking...
+                    {t("capture.submitting")}
                   </>
                 ) : (
-                  "Unlock My Report"
+                  t("capture.submit")
                 )}
               </button>
             </div>
@@ -449,10 +479,10 @@ export default function HomeEnergyScoreModal({
               <CheckCircle className="w-12 h-12 text-green-600" />
             </div>
             <h3 className="text-2xl md:text-3xl font-bold text-slate-900">
-              Report Unlocked!
+              {t("success.title")}
             </h3>
             <p className="text-lg text-slate-600">
-              We&apos;ll send your personalized correction summary shortly.
+              {t("success.message")}
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
@@ -463,10 +493,10 @@ export default function HomeEnergyScoreModal({
                 }}
                 className="px-10 py-4 bg-slate-900 text-white font-black text-[10px] uppercase tracking-[0.3em] rounded-2xl shadow-2xl shadow-slate-900/10 hover:scale-105 active:scale-95 transition-all"
               >
-                Book Consultation
+                {t("success.bookCta")}
               </button>
               <button className="px-10 py-4 bg-[#25D366] text-white font-black text-[10px] uppercase tracking-[0.3em] rounded-2xl shadow-2xl shadow-green-500/20 hover:scale-105 active:scale-95 transition-all">
-                Chat on WhatsApp
+                {t("success.whatsappCta")}
               </button>
             </div>
           </div>

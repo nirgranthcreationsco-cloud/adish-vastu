@@ -1,11 +1,55 @@
 "use client";
 
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 
 const CartContext = createContext<any>(null);
 
+const CART_STORAGE_KEY = "vastu_cart";
+const SHOP_RETURN_KEY = "vastu_shop_return";
+
+export function setShopReturnPath(path: string) {
+  if (typeof window === "undefined") return;
+  try {
+    sessionStorage.setItem(SHOP_RETURN_KEY, path);
+  } catch {
+    /* ignore */
+  }
+}
+
+export function getShopReturnPath(fallback = "/#remedies") {
+  if (typeof window === "undefined") return fallback;
+  try {
+    return sessionStorage.getItem(SHOP_RETURN_KEY) || fallback;
+  } catch {
+    return fallback;
+  }
+}
+
 export function CartProvider({ children }: any) {
-  const [cart, setCart] = useState([]);
+  const [cart, setCart] = useState<any[]>([]);
+  const [hydrated, setHydrated] = useState(false);
+
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(CART_STORAGE_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) setCart(parsed);
+      }
+    } catch {
+      /* ignore corrupt storage */
+    }
+    setHydrated(true);
+  }, []);
+
+  useEffect(() => {
+    if (!hydrated) return;
+    try {
+      localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cart));
+    } catch {
+      /* ignore */
+    }
+  }, [cart, hydrated]);
 
   function addToCart(product: any) {
     setCart((prev: any) => {
@@ -35,8 +79,14 @@ export function CartProvider({ children }: any) {
     );
   }
 
+  function clearCart() {
+    setCart([]);
+  }
+
   return (
-    <CartContext.Provider value={{ cart, addToCart, removeFromCart, updateQuantity }}>
+    <CartContext.Provider
+      value={{ cart, addToCart, removeFromCart, updateQuantity, clearCart, hydrated }}
+    >
       {children}
     </CartContext.Provider>
   );

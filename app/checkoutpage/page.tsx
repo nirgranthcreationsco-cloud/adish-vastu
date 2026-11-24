@@ -19,13 +19,15 @@ import Image from "next/image";
 
 import { supabase } from "@/supabase";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
-import { useCart } from "../context/cartcontext";
+import { getShopReturnPath, useCart } from "../context/cartcontext";
 
 type FormField = "name" | "phone" | "address" | "city" | "pincode";
 
 export default function CheckoutPage() {
-  const { cart, removeFromCart, updateQuantity } = useCart();
+  const t = useTranslations("checkout");
+  const { cart, removeFromCart, updateQuantity, clearCart } = useCart();
   const router = useRouter();
 
   const [isProcessing, setIsProcessing] = useState(false);
@@ -58,7 +60,7 @@ export default function CheckoutPage() {
     if (couponCode.trim().toUpperCase() === "VASTU20") {
       setAppliedCoupon("VASTU20");
     } else {
-      setCouponError("Invalid coupon code");
+      setCouponError(t("errCoupon"));
       setAppliedCoupon("");
     }
   }
@@ -74,27 +76,27 @@ export default function CheckoutPage() {
 
     switch (field) {
       case "name":
-        if (!value.trim()) msg = "Identification required";
-        else if (!/^[a-zA-Z\s]{3,}$/.test(value)) msg = "Protocol error: Full name required";
+        if (!value.trim()) msg = t("errNameRequired");
+        else if (!/^[a-zA-Z\s]{3,}$/.test(value)) msg = t("errNameInvalid");
         break;
 
       case "phone":
-        if (!value.trim()) msg = "Comms line required";
-        else if (value.length < 10) msg = "Incomplete sequence: 10 digits required";
+        if (!value.trim()) msg = t("errPhoneRequired");
+        else if (value.length < 10) msg = t("errPhoneInvalid");
         break;
 
       case "address":
-        if (!value.trim()) msg = "Locality data missing";
-        else if (value.length < 10) msg = "Insufficient data: Detailed address needed";
+        if (!value.trim()) msg = t("errAddressRequired");
+        else if (value.length < 10) msg = t("errAddressShort");
         break;
 
       case "city":
-        if (!value.trim()) msg = "Hub location required";
+        if (!value.trim()) msg = t("errCityRequired");
         break;
 
       case "pincode":
-        if (!value.trim()) msg = "Zone code required";
-        else if (!/^\d{6}$/.test(value)) msg = "Invalid zone: 6 digits only";
+        if (!value.trim()) msg = t("errPinRequired");
+        else if (!/^\d{6}$/.test(value)) msg = t("errPinInvalid");
         break;
     }
 
@@ -164,7 +166,7 @@ export default function CheckoutPage() {
       Object.values(form).some((v) => !v);
 
     if (invalid) {
-      alert("Please fix all errors before proceeding");
+      alert(t("errFixForm"));
       return;
     }
 
@@ -178,14 +180,24 @@ export default function CheckoutPage() {
       return;
     }
 
-    // 2. Create order via backend
-    const amountInPaise = Math.round(finalTotal * 100);
+    // 2. Create order via backend (server recalculates cart + coupon)
+    if (!process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID) {
+      alert("Payment is not configured. Missing Razorpay key.");
+      setIsProcessing(false);
+      return;
+    }
+
     let orderData;
     try {
       const orderRes = await fetch("/api/create-order", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ cart: cart, amount: amountInPaise, receipt: form.phone }),
+        body: JSON.stringify({
+          cart,
+          coupon: appliedCoupon || undefined,
+          receipt: form.phone,
+          amount: Math.round(finalTotal * 100),
+        }),
       });
       orderData = await orderRes.json();
       if (!orderRes.ok) throw new Error(orderData.error || "Failed to create order");
@@ -195,10 +207,10 @@ export default function CheckoutPage() {
       return;
     }
 
-    // 3. Open Razorpay modal
+    // 3. Open Razorpay Standard Checkout modal
     const options = {
-      key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID, // Enter the Key ID generated from the Dashboard
-      amount: orderData.amount, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
+      key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
+      amount: orderData.amount,
       currency: orderData.currency,
       name: "Jain Vastu Solutions",
       description: "Sacred Items Checkout",
@@ -219,6 +231,8 @@ export default function CheckoutPage() {
           if (!verifyRes.ok) throw new Error(verifyData.error || "Verification failed");
 
           // 5. On successful verification, save order to Supabase
+          // Persist charged amount from Razorpay order (authoritative)
+          const chargedRupees = Number(orderData.amount) / 100;
           const { error } = await supabase.from("orders").insert({
             id: crypto.randomUUID(),
             name: form.name,
@@ -226,16 +240,21 @@ export default function CheckoutPage() {
             address: form.address,
             city: form.city,
             pincode: form.pincode,
-            total: finalTotal,
-            status: "paid", // Mark as paid
-            cart_items: cart,
+            total: chargedRupees,
+            status: "paid",
+            cart_items: {
+              items: cart,
+              coupon: appliedCoupon || null,
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+            },
           });
 
           if (error) {
             console.error("Supabase Order Insertion Error:", error);
             alert(`Order saving failed: ${error.message}`);
           } else {
-            localStorage.removeItem("cart");
+            clearCart();
             router.push("/ordersuccess");
           }
         } catch (err: any) {
@@ -266,8 +285,13 @@ export default function CheckoutPage() {
     paymentObject.open();
   }
 
+  const goBackToShop = () => {
+    const returnPath = getShopReturnPath("/#remedies");
+    router.push(returnPath);
+  };
+
   if (!cart.length)
-    return <EmptyCartUI onBack={() => router.push("/")} />;
+    return <EmptyCartUI onBack={goBackToShop} />;
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -281,24 +305,24 @@ export default function CheckoutPage() {
       <div className="relative z-10 pt-16 pb-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
 
-          {/* Top Navigation Anchor */}
+          {/* Top Navigation Anchor — returns to last product list, not home top */}
           <div className="mb-6">
             <button
-              onClick={() => router.push("/#remedies")}
+              onClick={goBackToShop}
               className="flex items-center gap-2 text-slate-600 hover:text-amber-700 font-bold text-sm transition-colors"
             >
               <ArrowLeft className="w-4 h-4" />
-              <span>Continue Shopping Remedies</span>
+              <span>{t("backToProducts")}</span>
             </button>
           </div>
 
           {/* PROGRESS STEPS - MINI */}
           <div className="mb-8 flex items-center justify-center gap-4 text-xs font-bold tracking-widest uppercase text-slate-400">
-            <span className="text-amber-600">Cart</span>
+            <span className="text-amber-600">{t("cart")}</span>
             <ChevronRight className="w-3 h-3" />
-            <span className="text-slate-900 px-3 py-1 bg-white border border-slate-200 rounded-full shadow-sm">Checkout</span>
+            <span className="text-slate-900 px-3 py-1 bg-white border border-slate-200 rounded-full shadow-sm">{t("checkout")}</span>
             <ChevronRight className="w-3 h-3" />
-            <span>Success</span>
+            <span>{t("success")}</span>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
@@ -311,37 +335,37 @@ export default function CheckoutPage() {
                     <MapPin className="w-6 h-6 text-amber-600" />
                   </div>
                   <div>
-                    <h1 className="text-3xl font-black text-slate-900 tracking-tight">Checkout</h1>
-                    <p className="text-slate-500 font-medium">Verify your sacred delivery details</p>
+                    <h1 className="text-3xl font-black text-slate-900 tracking-tight">{t("title")}</h1>
+                    <p className="text-slate-500 font-medium">{t("subtitle")}</p>
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <FormField
-                    label="Full Name"
+                    label={t("fullName")}
                     value={form.name}
                     error={errors.name}
                     onChange={(v) => onChange("name", v)}
-                    placeholder="Enter your name"
+                    placeholder={t("fullNamePh")}
                   />
                   <FormField
-                    label="Phone Number"
+                    label={t("phone")}
                     value={form.phone}
                     error={errors.phone}
                     onChange={(v) => onChange("phone", v)}
-                    placeholder="Enter 10-digit number"
+                    placeholder={t("phonePh")}
                   />
                   <div className="md:col-span-2">
                     <FormField
-                      label="Street Address"
+                      label={t("address")}
                       value={form.address}
                       error={errors.address}
                       onChange={(v) => onChange("address", v)}
-                      placeholder="House no, Street name, Landmark"
+                      placeholder={t("addressPh")}
                     />
                   </div>
                   <AutocompleteField
-                    label="City"
+                    label={t("city")}
                     value={form.city}
                     error={errors.city}
                     onChange={(v) => onChange("city", v)}
@@ -352,14 +376,14 @@ export default function CheckoutPage() {
                       setShowSuggestions(false);
                     }}
                     show={showSuggestions}
-                    placeholder="Enter city"
+                    placeholder={t("cityPh")}
                   />
                   <FormField
-                    label="Pincode"
+                    label={t("pincode")}
                     value={form.pincode}
                     error={errors.pincode}
                     onChange={(v) => onChange("pincode", v)}
-                    placeholder="6-digit pincode"
+                    placeholder={t("pincodePh")}
                   />
                 </div>
 
@@ -367,22 +391,22 @@ export default function CheckoutPage() {
                   <div className="flex items-start gap-3">
                     <div className="p-2 bg-green-50 rounded-lg"><Truck className="w-4 h-4 text-green-600" /></div>
                     <div>
-                      <p className="text-xs font-black uppercase tracking-widest text-slate-400">Delivery</p>
-                      <p className="text-sm font-bold text-slate-700">Free & Fast</p>
+                      <p className="text-xs font-black uppercase tracking-widest text-slate-400">{t("delivery")}</p>
+                      <p className="text-sm font-bold text-slate-700">{t("deliveryValue")}</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
                     <div className="p-2 bg-blue-50 rounded-lg"><Lock className="w-4 h-4 text-blue-600" /></div>
                     <div>
-                      <p className="text-xs font-black uppercase tracking-widest text-slate-400">Payment</p>
-                      <p className="text-sm font-bold text-slate-700">SSL Secure</p>
+                      <p className="text-xs font-black uppercase tracking-widest text-slate-400">{t("payment")}</p>
+                      <p className="text-sm font-bold text-slate-700">{t("paymentValue")}</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
                     <div className="p-2 bg-amber-50 rounded-lg"><ShieldCheck className="w-4 h-4 text-amber-600" /></div>
                     <div>
-                      <p className="text-xs font-black uppercase tracking-widest text-slate-400">Authentic</p>
-                      <p className="text-sm font-bold text-slate-700">100% Verified</p>
+                      <p className="text-xs font-black uppercase tracking-widest text-slate-400">{t("authentic")}</p>
+                      <p className="text-sm font-bold text-slate-700">{t("authenticValue")}</p>
                     </div>
                   </div>
                 </div>
@@ -395,9 +419,9 @@ export default function CheckoutPage() {
                   disabled={isProcessing}
                   className="w-full py-5 bg-slate-900 text-white font-black text-xl rounded-2xl shadow-2xl hover:bg-slate-800 transition-all flex items-center justify-center gap-4 group disabled:opacity-70"
                 >
-                  {isProcessing ? "Processing..." : (
+                  {isProcessing ? t("processing") : (
                     <>
-                      Place Order ₹{finalTotal.toLocaleString('en-IN')}
+                      {t("placeOrder", { amount: finalTotal.toLocaleString("en-IN") })}
                       <ChevronRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
                     </>
                   )}
@@ -417,8 +441,8 @@ export default function CheckoutPage() {
                         <ShoppingBag className="w-6 h-6" />
                       </div>
                       <div>
-                        <h2 className="text-xl font-black text-slate-900">Your Selection</h2>
-                        <p className="text-xs font-bold text-amber-600 uppercase tracking-widest">{cart.length} Sacred Items</p>
+                        <h2 className="text-xl font-black text-slate-900">{t("yourSelection")}</h2>
+                        <p className="text-xs font-bold text-amber-600 uppercase tracking-widest">{t("sacredItems", { count: cart.length })}</p>
                       </div>
                     </div>
                   </div>
@@ -484,7 +508,7 @@ export default function CheckoutPage() {
                 <div className="p-8 bg-slate-50 border-t border-slate-200 flex-shrink-0">
                   {/* Coupon Code Section */}
                   <div className="mb-6 p-4 bg-amber-50/50 rounded-2xl border border-amber-100/80">
-                    <p className="text-[10px] font-black text-amber-800 uppercase tracking-wider mb-2">Have a promo code?</p>
+                    <p className="text-[10px] font-black text-amber-800 uppercase tracking-wider mb-2">{t("promoCode")}</p>
                     <div className="flex gap-2">
                       <input
                         type="text"
@@ -499,14 +523,14 @@ export default function CheckoutPage() {
                           onClick={handleRemoveCoupon}
                           className="px-4 py-2 bg-red-50 hover:bg-red-100 text-red-600 rounded-xl text-xs font-black uppercase tracking-wider transition-colors border border-red-100"
                         >
-                          Remove
+                          {t("remove")}
                         </button>
                       ) : (
                         <button
                           onClick={handleApplyCoupon}
                           className="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-black uppercase tracking-wider transition-colors"
                         >
-                          Apply
+                          {t("apply")}
                         </button>
                       )}
                     </div>
@@ -515,39 +539,39 @@ export default function CheckoutPage() {
                     )}
                     {appliedCoupon && (
                       <p className="text-[10px] font-bold text-green-600 mt-1.5 flex items-center gap-1">
-                        <CheckCircle2 className="w-3.5 h-3.5" /> Code {appliedCoupon} applied! 20% discount activated.
+                        <CheckCircle2 className="w-3.5 h-3.5" /> {appliedCoupon} — {t("discount")}
                       </p>
                     )}
                   </div>
 
                   <div className="space-y-3 mb-6">
                     <div className="flex justify-between items-center text-sm font-bold text-slate-500">
-                      <span>Subtotal</span>
+                      <span>{t("subtotal")}</span>
                       <span className="text-slate-900 tracking-tight">₹{total.toLocaleString('en-IN')}</span>
                     </div>
                     {hasDiscount && (
                       <div className="flex justify-between items-center text-sm font-bold text-green-600">
-                        <span>Promo Discount (20%)</span>
+                        <span>{t("discount")} (20%)</span>
                         <span className="tracking-tight">- ₹{discountAmount.toLocaleString('en-IN')}</span>
                       </div>
                     )}
                     <div className="flex justify-between items-center text-sm font-bold text-slate-500">
-                      <span>Shipping</span>
-                      <span className="text-green-600 uppercase tracking-widest text-[10px]">Free Delivery</span>
+                      <span>{t("shipping")}</span>
+                      <span className="text-green-600 uppercase tracking-widest text-[10px]">{t("free")}</span>
                     </div>
                   </div>
 
                   <div className="pt-6 border-t border-slate-300">
                     <div className="flex justify-between items-end mb-8">
                       <div>
-                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-1">Grand Total</p>
+                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-1">{t("total")}</p>
                         <p className="text-4xl font-black text-slate-900 tracking-tighter">
                           ₹{finalTotal.toLocaleString('en-IN')}
                         </p>
                       </div>
                       <div className="text-right">
                         <p className="text-[10px] font-black text-green-600 uppercase tracking-widest mb-1 flex items-center justify-end gap-1">
-                          <CheckCircle2 className="w-3 h-3" /> All Inclusive
+                          <CheckCircle2 className="w-3 h-3" /> {t("authenticValue")}
                         </p>
                       </div>
                     </div>
@@ -558,10 +582,10 @@ export default function CheckoutPage() {
                       className="hidden lg:flex w-full py-5 bg-slate-900 text-white font-black text-lg rounded-2xl shadow-xl shadow-slate-200 hover:bg-slate-800 transition-all items-center justify-center gap-4 group disabled:opacity-70"
                     >
                       {isProcessing ? (
-                        <span className="animate-pulse">Processing...</span>
+                        <span className="animate-pulse">{t("processing")}</span>
                       ) : (
                         <>
-                          Complete Sacred Order
+                          {t("placeOrder", { amount: finalTotal.toLocaleString("en-IN") })}
                           <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                         </>
                       )}
@@ -666,20 +690,21 @@ function AutocompleteField({
 }
 
 function EmptyCartUI({ onBack }: { onBack: () => void }) {
+  const t = useTranslations("checkout");
   return (
     <div className="min-h-screen bg-white flex flex-col justify-center items-center text-center p-6">
       <div className="w-32 h-32 bg-amber-50 rounded-[3rem] flex items-center justify-center mb-10 border border-amber-100">
         <ShoppingBag className="w-12 h-12 text-amber-600" />
       </div>
-      <h2 className="text-4xl font-black text-slate-900 tracking-tight mb-4">Your Cart is Empty</h2>
+      <h2 className="text-4xl font-black text-slate-900 tracking-tight mb-4">{t("emptyTitle")}</h2>
       <p className="text-slate-500 font-medium max-w-sm mb-12">
-        A journey of a thousand sacred steps begins with a single remedy. Explore our collection.
+        {t("emptyDesc")}
       </p>
       <button
         onClick={onBack}
         className="px-10 py-5 bg-slate-900 text-white rounded-2xl font-black text-lg hover:scale-105 transition-all shadow-2xl shadow-slate-300"
       >
-        Explore Remedies
+        {t("exploreRemedies")}
       </button>
     </div>
   );

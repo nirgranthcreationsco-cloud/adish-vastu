@@ -2,6 +2,7 @@
 
 import { Award, ChevronRight, Loader2, Sparkles } from "lucide-react";
 import { useTranslations } from 'next-intl';
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -11,6 +12,23 @@ interface DriveFolder {
   mimeType: string;
   thumbnailLink?: string;
   description?: string;
+}
+
+function getCategoryBannerImage(name: string): string | null {
+  const normalized = name.toLowerCase();
+  if (normalized.includes('statue')) {
+    return '/categories/vastu-statues.jpg';
+  }
+  if (normalized.includes('gem') || (normalized.includes('stone') && !normalized.includes('bracelet'))) {
+    return '/categories/gem-stone.jpg';
+  }
+  if (normalized.includes('bracelet')) {
+    return '/categories/stone-bracelets.jpg';
+  }
+  if (normalized.includes('remedy') || normalized.includes('remedies') || normalized.includes('vastu')) {
+    return '/categories/vastu-remedies.jpg';
+  }
+  return null;
 }
 
 function getCategoryLineArt(name: string) {
@@ -108,11 +126,12 @@ export default function RemediesSection() {
   };
 
   const handleCategoryClick = (categoryName: string) => {
-    router.push(`/remedies/${encodeURIComponent(categoryName.replace(/\s+/g, '-'))}`);
+    const path = `/remedies/${encodeURIComponent(categoryName.replace(/\s+/g, '-'))}`;
+    router.push(path);
   };
 
   return (
-    <section id="remedies" className="relative py-16 md:py-24 overflow-hidden bg-gradient-to-b from-orange-100 via-amber-50 to-orange-100 scroll-mt-12">
+    <section id="remedies" className="relative py-10 md:py-16 overflow-hidden bg-gradient-to-b from-orange-100 via-amber-50 to-orange-100 scroll-mt-16">
       
       {/* Subtle Pattern */}
       <div className="absolute inset-0 opacity-[0.03]">
@@ -127,7 +146,7 @@ export default function RemediesSection() {
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 mb-6">
           <div className="bg-blue-100 border-2 border-blue-300 rounded-xl p-4 text-center">
             <p className="text-blue-900 font-semibold">
-              🧪 Development Mode: Using mock data. Configure Google Drive API key to see real products.
+              🧪 {t('devMode')}
             </p>
           </div>
         </div>
@@ -177,6 +196,7 @@ export default function RemediesSection() {
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mb-10">
             {categories.map((category) => {
               const name = category.name;
+              const bannerImg = getCategoryBannerImage(name);
 
               return (
                 <div
@@ -184,24 +204,32 @@ export default function RemediesSection() {
                   onClick={() => handleCategoryClick(category.name)}
                   className="group relative bg-[#ffffff] rounded-[1.5rem] sm:rounded-[2.5rem] border border-slate-100 hover:border-amber-400/50 p-2 sm:p-4 transition-all duration-500 hover:-translate-y-2 cursor-pointer shadow-[0_15px_40px_rgba(0,0,0,0.04)] hover:shadow-[0_30px_60px_rgba(245,158,11,0.12)]"
                 >
-                  <div className="relative h-28 sm:h-60 w-full rounded-[1rem] sm:rounded-[2rem] overflow-hidden bg-gradient-to-br from-neutral-950 via-stone-900 to-amber-950/80 shadow-xl border border-white/5">
-                    {/* Sacred Overlay */}
-                    <div className="absolute inset-0 bg-black/10 group-hover:bg-black/0 transition-colors duration-500" />
+                  <div className="relative h-32 sm:h-64 w-full rounded-[1rem] sm:rounded-[2rem] overflow-hidden bg-gradient-to-br from-neutral-950 via-stone-900 to-amber-950/80 shadow-xl border border-white/5">
+                    {bannerImg ? (
+                      <Image
+                        src={bannerImg}
+                        alt={name}
+                        fill
+                        sizes="(max-width: 640px) 50vw, 25vw"
+                        className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+                      />
+                    ) : (
+                      <>
+                        <div className="absolute inset-0 bg-black/10 group-hover:bg-black/0 transition-colors duration-500" />
+                        <div className="absolute top-0 right-0 w-16 h-16 sm:w-32 sm:h-32 bg-amber-500/10 blur-[20px] sm:blur-[40px] rounded-full -mr-4 -mt-4 sm:-mr-8 sm:-mt-8 group-hover:scale-150 transition-transform duration-1000" />
+                        <div className="absolute inset-0 flex items-center justify-center group-hover:scale-110 transition-transform duration-700 ease-out">
+                          {getCategoryLineArt(name)}
+                        </div>
+                      </>
+                    )}
                     
-                    {/* Animated Gold Glow */}
-                    <div className="absolute top-0 right-0 w-16 h-16 sm:w-32 sm:h-32 bg-amber-500/10 blur-[20px] sm:blur-[40px] rounded-full -mr-4 -mt-4 sm:-mr-8 sm:-mt-8 group-hover:scale-150 transition-transform duration-1000" />
-                    
-                    <div className="absolute inset-0 flex items-center justify-center group-hover:scale-110 transition-transform duration-700 ease-out">
-                      {getCategoryLineArt(name)}
-                    </div>
-                    
-                    <div className="absolute top-2 left-2 sm:top-5 sm:left-5 px-1.5 py-0.5 sm:px-3 sm:py-1 bg-white/5 backdrop-blur-md border border-white/10 rounded-full shadow-lg">
-                      <span className="text-[7px] sm:text-[9px] font-black text-amber-200/80 tracking-[0.1em] sm:tracking-[0.2em] uppercase">Vedic Certified</span>
+                    <div className="absolute top-2 left-2 sm:top-5 sm:left-5 px-1.5 py-0.5 sm:px-3 sm:py-1 bg-black/40 backdrop-blur-md border border-white/10 rounded-full shadow-lg z-10">
+                      <span className="text-[7px] sm:text-[9px] font-black text-amber-200/90 tracking-[0.1em] sm:tracking-[0.2em] uppercase">{t('cardBadge')}</span>
                     </div>
 
-                    <div className="absolute bottom-2 left-2 right-2 sm:bottom-5 sm:left-5 sm:right-5 translate-y-12 sm:translate-y-20 group-hover:translate-y-0 transition-transform duration-500">
-                      <div className="bg-black/40 backdrop-blur-md border border-white/10 p-1 sm:p-3 rounded-lg sm:rounded-xl flex items-center justify-between">
-                        <span className="text-[7px] sm:text-[9px] font-black text-white/90 uppercase tracking-widest">Master Energized</span>
+                    <div className="absolute bottom-2 left-2 right-2 sm:bottom-5 sm:left-5 sm:right-5 translate-y-12 sm:translate-y-20 group-hover:translate-y-0 transition-transform duration-500 z-10">
+                      <div className="bg-black/60 backdrop-blur-md border border-white/10 p-1 sm:p-3 rounded-lg sm:rounded-xl flex items-center justify-between">
+                        <span className="text-[7px] sm:text-[9px] font-black text-white/90 uppercase tracking-widest">{t('cardFooter')}</span>
                         <Sparkles className="w-2.5 h-2.5 sm:w-3.5 sm:h-3.5 text-amber-400" />
                       </div>
                     </div>
@@ -210,18 +238,18 @@ export default function RemediesSection() {
                   <div className="px-1 sm:px-3 pt-3 sm:pt-6 pb-2 sm:pb-4">
                     <div className="flex items-center gap-1 sm:gap-1.5 mb-1 sm:mb-2.5">
                       <div className="w-1 h-1 sm:w-1.5 sm:h-1.5 bg-amber-500 rounded-full" />
-                      <span className="text-[7px] sm:text-[9px] font-black text-amber-600 uppercase tracking-widest">Premium Selection</span>
+                      <span className="text-[7px] sm:text-[9px] font-black text-amber-600 uppercase tracking-widest">{t('premium')}</span>
                     </div>
-                    <h4 className="text-sm sm:text-2xl font-black text-slate-900 mb-1 tracking-tight group-hover:text-amber-600 transition-colors line-clamp-1">
+                    <h4 className="text-sm sm:text-2xl font-black text-slate-900 mb-1 tracking-tight group-hover:text-amber-600 transition-colors line-clamp-1 product-title">
                       {category.name}
                     </h4>
                     <p className="text-slate-500 text-[10px] sm:text-xs font-medium leading-normal sm:leading-relaxed mb-3 sm:mb-6 pr-1 line-clamp-2">
-                      Authentic spiritual tools meticulously chosen & activated for vastu alignment.
+                      {t('cardDesc')}
                     </p>
                     
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-1 bg-slate-50 px-2 py-1 rounded-md sm:rounded-lg group-hover:bg-amber-600 transition-all duration-300">
-                        <span className="text-[7px] sm:text-[9px] font-black text-slate-600 group-hover:text-white uppercase tracking-widest">View Collection</span>
+                        <span className="text-[7px] sm:text-[9px] font-black text-slate-600 group-hover:text-white uppercase tracking-widest">{t('viewCollection')}</span>
                         <ChevronRight className="w-2.5 h-2.5 sm:w-3.5 sm:h-3.5 text-slate-400 group-hover:text-white group-hover:translate-x-0.5 transition-all" />
                       </div>
                     </div>

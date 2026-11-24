@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { X, MessageCircle, Send, Sparkles, CheckCircle2, ShieldCheck, HelpCircle } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { supabase } from "@/supabase";
 
 interface ProductEnquiryModalProps {
@@ -21,6 +22,8 @@ export default function ProductEnquiryModal({
   selectedVariant,
   enquiryType,
 }: ProductEnquiryModalProps) {
+  const t = useTranslations("enquiry");
+  const tCommon = useTranslations("common");
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [quantity, setQuantity] = useState("1");
@@ -50,9 +53,9 @@ export default function ProductEnquiryModal({
 
   const validate = () => {
     const errs: { name?: string; phone?: string } = {};
-    if (!name.trim()) errs.name = "Please enter your name";
+    if (!name.trim()) errs.name = t("errName");
     if (!phone.trim() || phone.replace(/\D/g, "").length < 10) {
-      errs.phone = "Please enter a valid 10-digit WhatsApp number";
+      errs.phone = t("errPhone");
     }
     setErrors(errs);
     return Object.keys(errs).length === 0;
@@ -147,15 +150,13 @@ export default function ProductEnquiryModal({
           </button>
           <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/10 border border-white/20 rounded-full text-[10px] font-black tracking-widest uppercase mb-2">
             <Sparkles className="w-3 h-3 text-amber-300" />
-            {enquiryType === "price_request" ? "Price On Request" : "Personal Guidance"}
+            {enquiryType === "price_request" ? t("priceTitle") : t("consultTitle")}
           </div>
           <h3 className="text-xl sm:text-2xl font-black tracking-tight">
-            {enquiryType === "price_request" ? "Get the Latest Price" : "Talk to a Vastu Expert"}
+            {enquiryType === "price_request" ? t("priceTitle") : t("consultTitle")}
           </h3>
           <p className="text-amber-100 text-xs sm:text-sm mt-1 leading-relaxed">
-            {enquiryType === "price_request"
-              ? "Rates vary by size, material, or custom specifications. Share your details and our team will provide instant pricing."
-              : "Not sure about the right placement or sizing? Get direct, scientific guidance before buying."}
+            {productName}
           </p>
         </div>
 
@@ -179,16 +180,16 @@ export default function ProductEnquiryModal({
               <div className="w-16 h-16 bg-emerald-100 border border-emerald-300 text-emerald-600 rounded-full flex items-center justify-center mx-auto animate-bounce">
                 <CheckCircle2 className="w-9 h-9" />
               </div>
-              <h4 className="text-2xl font-black text-slate-900">Enquiry Received!</h4>
+              <h4 className="text-2xl font-black text-slate-900">{t("successTitle")}</h4>
               <p className="text-sm text-slate-600 max-w-sm mx-auto leading-relaxed">
-                Thank you, <strong className="text-slate-900">{name}</strong>. Our senior Vastu team has received your enquiry for <strong>{productName}</strong> and will connect via WhatsApp shortly.
+                {t("successMsg")}
               </p>
               <div className="pt-4">
                 <button
                   onClick={onClose}
                   className="px-8 py-3 bg-slate-900 text-white font-bold rounded-xl text-sm hover:bg-slate-800 transition-all"
                 >
-                  Back to Store
+                  {tCommon("continueShopping")}
                 </button>
               </div>
             </div>
@@ -196,11 +197,11 @@ export default function ProductEnquiryModal({
             <form onSubmit={handleSubmitLead} className="space-y-4">
               <div>
                 <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                  Your Full Name <span className="text-red-500">*</span>
+                  {t("name")} <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
-                  placeholder="e.g. Rajesh Sharma"
+                  placeholder={t("namePh")}
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   className={`w-full px-4 py-3 bg-slate-50 border ${errors.name ? "border-red-400 bg-red-50/20" : "border-slate-200"} rounded-xl text-slate-900 text-sm font-semibold outline-none focus:border-amber-500 focus:bg-white transition-all`}
@@ -210,13 +211,13 @@ export default function ProductEnquiryModal({
 
               <div>
                 <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                  WhatsApp Number <span className="text-red-500">*</span>
+                  {t("phone")} <span className="text-red-500">*</span>
                 </label>
                 <div className="relative flex items-center">
                   <span className="absolute left-3.5 text-xs font-bold text-slate-500 pointer-events-none">+91</span>
                   <input
                     type="tel"
-                    placeholder="98765 43210"
+                    placeholder={t("phonePh")}
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
                     className={`w-full pl-12 pr-4 py-3 bg-slate-50 border ${errors.phone ? "border-red-400 bg-red-50/20" : "border-slate-200"} rounded-xl text-slate-900 text-sm font-semibold outline-none focus:border-amber-500 focus:bg-white transition-all`}
@@ -228,28 +229,28 @@ export default function ProductEnquiryModal({
               {enquiryType === "price_request" && (
                 <div>
                   <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                    Quantity Needed
+                    {t("quantity")}
                   </label>
                   <select
                     value={quantity}
                     onChange={(e) => setQuantity(e.target.value)}
                     className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 text-sm font-semibold outline-none focus:border-amber-500 focus:bg-white transition-all"
                   >
-                    <option value="1">1 Unit / Piece</option>
-                    <option value="2-5">2 to 5 Units</option>
-                    <option value="5-20">5 to 20 Units (Bulk)</option>
-                    <option value="20+">20+ Units (Commercial/Project)</option>
+                    <option value="1">1</option>
+                    <option value="2-5">2–5</option>
+                    <option value="5-20">5–20</option>
+                    <option value="20+">20+</option>
                   </select>
                 </div>
               )}
 
               <div>
                 <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                  {enquiryType === "price_request" ? "Message or Requirement (Optional)" : "What do you need help with? (Optional)"}
+                  {t("message")}
                 </label>
                 <textarea
                   rows={2}
-                  placeholder={enquiryType === "price_request" ? "Any specific size, finish, or location preference..." : "Briefly describe your room direction or space concern..."}
+                  placeholder={t("messagePh")}
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
                   className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 text-sm font-medium outline-none focus:border-amber-500 focus:bg-white transition-all resize-none"
@@ -265,7 +266,7 @@ export default function ProductEnquiryModal({
                   className="w-full py-3.5 px-4 bg-emerald-600 hover:bg-emerald-700 active:scale-[0.99] text-white font-black text-sm rounded-xl shadow-lg shadow-emerald-600/25 flex items-center justify-center gap-2 transition-all group"
                 >
                   <MessageCircle className="w-5 h-5 fill-current" />
-                  <span>Get {enquiryType === "price_request" ? "Price" : "Guidance"} on WhatsApp</span>
+                  <span>{t("whatsapp")}</span>
                 </button>
 
                 <button
@@ -274,7 +275,7 @@ export default function ProductEnquiryModal({
                   className="w-full py-3 px-4 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 transition-all"
                 >
                   <Send className="w-3.5 h-3.5 text-slate-500" />
-                  <span>{isSubmitting ? "Submitting..." : "Submit Direct Enquiry"}</span>
+                  <span>{isSubmitting ? t("submitting") : t("submit")}</span>
                 </button>
               </div>
 
