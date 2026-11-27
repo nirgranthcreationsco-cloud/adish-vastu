@@ -3956,8 +3956,9 @@ export function matchDriveItemToCatalog(fileName: string): { product: CatalogPro
   return { product: null, variant: null };
 }
 
-// Technical tools that strictly require expert consultation before installation
-const CONSULTATION_KEYWORDS = [
+// Specialist physical products sold on enquiry (not consultation services).
+// Kept for catalogue tagging; commerce UI treats these as ENQUIRE_PRICE.
+const SPECIALIST_ENQUIRY_KEYWORDS = [
   'lecher antenna',
   'dowsing rod',
   'geopathic',
@@ -3976,9 +3977,9 @@ export function getProductStatus(product: CatalogProduct | null | undefined, sel
   
   const nameLower = product.name.toLowerCase();
   
-  // 1. Consultation required for high-precision or complex energetic diagnostic tools
-  if (CONSULTATION_KEYWORDS.some(k => nameLower.includes(k))) {
-    return 'CONSULTATION_REQUIRED';
+  // Specialist physical items: enquire for availability/specs (no service booking)
+  if (SPECIALIST_ENQUIRY_KEYWORDS.some(k => nameLower.includes(k))) {
+    return 'ENQUIRE_PRICE';
   }
   
   // 2. Products with multiple variants
@@ -4036,7 +4037,7 @@ export function getEducationalInfo(productName: string, category: string): Produ
       whatIsIt: "Precision energetic diagnosis and grounding instrument for earth radiation and sub-soil grid line detection.",
       whyUsed: "Identifies and neutralizes harmful geopathic stress lines, underground water veins, and grid intersections that cause persistent disturbances.",
       suitableFor: "Spaces with chronic unexplained sleep issues, heaviness, or ongoing energetic resistance.",
-      howUsed: "Must be calibrated and installed under expert guidance following energetic mapping of the premises."
+      howUsed: "Follow the product placement instructions supplied with the physical item. For complex installations, refer to the product leaflet included in the package."
     };
   }
   
@@ -4053,6 +4054,6 @@ export function getEducationalInfo(productName: string, category: string): Produ
     whatIsIt: `Authentic Vastu remedy curated for energetic space alignment and prosperity in ${category}.`,
     whyUsed: "Assists in transmuting stagnant or negative environmental energies into harmonious life-force frequencies.",
     suitableFor: "Residential homes, commercial establishments, and renovation projects seeking Vedic energetic harmony.",
-    howUsed: "Place in the recommended directional zone following personal space consultation."
+    howUsed: "Place according to the directional guidance included with the physical product packaging."
   };
 }

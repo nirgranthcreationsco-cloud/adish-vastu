@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /api/
+Disallow: /checkoutpage
+Disallow: /ordersuccess
+
+Sitemap: https://vastuacademy.com/sitemap.xml

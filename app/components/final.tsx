@@ -6,7 +6,6 @@ import {
   ChevronRight,
   Facebook,
   Instagram,
-  Mail,
   MapPin,
   Phone,
   Send,
@@ -384,10 +383,7 @@ const handleSubmit = async (e: React.MouseEvent) => {
               <h4 className="text-slate-900 font-semibold mb-4">{t('contact')}</h4>
               <ul className="space-y-3 text-sm text-slate-600">
                 <li className="flex items-center gap-2">
-                  <Phone className="w-4 h-4 text-amber-700" /> +91 98765 43210
-                </li>
-                <li className="flex items-center gap-2">
-                  <Mail className="w-4 h-4 text-amber-700" /> support@adishacademy.in
+                  <Phone className="w-4 h-4 text-amber-700" /> +91 81036 38945
                 </li>
                 <li className="flex items-center gap-2">
                   <MapPin className="w-4 h-4 text-amber-700" /> Ahmedabad, India

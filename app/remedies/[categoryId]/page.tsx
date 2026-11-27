@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeft, Loader2, Package, ShoppingCart, Search, Sparkles, HelpCircle, MessageCircle, Info, ChevronRight, Compass, ShieldCheck } from "lucide-react";
+import { ArrowLeft, Loader2, Package, ShoppingCart, Search, Sparkles, HelpCircle, MessageCircle, Info, ChevronRight, ShieldCheck } from "lucide-react";
 import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
@@ -10,7 +10,6 @@ import { setShopReturnPath, useCart } from "../../context/cartcontext";
 import { productCatalog, CatalogProduct, matchDriveItemToCatalog, getProductStatus, ProductStatus, getProductsByCategory } from "@/app/data/productCatalog";
 import ProductEnquiryModal from "../../components/productenquirymodal";
 import ProductDetailModal from "../../components/productdetailmodal";
-import HomeEnergyScoreModal from "../../components/homeenergyscoremodal";
 
 interface DriveItem {
   id: string;
@@ -75,7 +74,6 @@ export default function CategoryPage() {
     categoryName: "",
     enquiryType: "price_request",
   });
-  const [isEnergyModalOpen, setIsEnergyModalOpen] = useState(false);
   const [allCategories, setAllCategories] = useState<{ id: string; name: string }[]>([]);
 
   const categoryId = params.categoryId as string;
@@ -725,47 +723,26 @@ export default function CategoryPage() {
           </div>
         )}
 
-        {/* 11. "NOT SURE WHAT YOU NEED?" STORE-WIDE SALES FUNNEL SECTION */}
+        {/* Physical product support only — no consultation / energy-score services */}
         <div className="mt-16 md:mt-24 max-w-4xl mx-auto">
-          <div className="relative rounded-3xl bg-gradient-to-br from-amber-900 via-slate-900 to-amber-950 text-white p-8 sm:p-12 overflow-hidden shadow-2xl border border-amber-400/30">
-            <div className="absolute top-0 right-0 w-64 h-64 bg-amber-500/10 blur-[60px] rounded-full pointer-events-none" />
-            
+          <div className="relative rounded-3xl bg-stone-900 text-white p-8 sm:p-12 overflow-hidden shadow-2xl border border-amber-400/20">
             <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8 text-center md:text-left">
               <div className="space-y-3 max-w-xl">
-                <div className="inline-flex items-center gap-2 px-3 py-1 bg-amber-500/20 border border-amber-400/30 rounded-full text-[10px] font-black text-amber-300 uppercase tracking-widest">
-                  <Compass className="w-3.5 h-3.5 text-amber-400 animate-spin" style={{ animationDuration: "12s" }} />
-                  {t("funnelBadge")}
-                </div>
-                <h3 className="text-2xl sm:text-3xl font-black tracking-tight text-white">
-                  {t("funnelTitle")}
+                <h3 className="text-2xl sm:text-3xl font-bold tracking-tight text-white">
+                  Need help choosing a physical product?
                 </h3>
-                <p className="text-amber-100/90 text-sm sm:text-base font-normal leading-relaxed">
-                  {t("funnelDesc")}
+                <p className="text-amber-100/90 text-sm sm:text-base leading-relaxed">
+                  Contact us for product availability, specifications, or shipping questions.
+                  This store sells physical Vastu and religious products only — not consultations or astrology services.
                 </p>
               </div>
-
-              <div className="flex flex-col sm:flex-row md:flex-col gap-3 w-full md:w-auto flex-shrink-0">
-                <button
-                  onClick={() => setEnquiryModalData({
-                    isOpen: true,
-                    productName: `General Consultation (${categoryName})`,
-                    categoryName: categoryName,
-                    enquiryType: "consultation_request"
-                  })}
-                  className="px-6 py-4 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-black text-xs sm:text-sm uppercase tracking-wider rounded-2xl shadow-xl shadow-amber-500/25 hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-2"
-                >
-                  <MessageCircle className="w-4 h-4 fill-current" />
-                  <span>{t("talkVastuExpert")}</span>
-                </button>
-
-                <button
-                  onClick={() => setIsEnergyModalOpen(true)}
-                  className="px-6 py-3.5 bg-white/10 hover:bg-white/20 text-amber-200 border border-amber-300/30 font-black text-xs sm:text-sm uppercase tracking-wider rounded-2xl backdrop-blur-md transition-all flex items-center justify-center gap-2"
-                >
-                  <Sparkles className="w-4 h-4 text-amber-300" />
-                  <span>{t("checkHomeEnergy")}</span>
-                </button>
-              </div>
+              <a
+                href="/contact"
+                className="px-6 py-4 bg-amber-500 hover:bg-amber-400 text-stone-950 font-bold text-xs sm:text-sm uppercase tracking-wider rounded-2xl transition-all flex items-center justify-center gap-2"
+              >
+                <MessageCircle className="w-4 h-4" />
+                <span>Contact Us</span>
+              </a>
             </div>
           </div>
         </div>
@@ -812,11 +789,6 @@ export default function CategoryPage() {
         enquiryType={enquiryModalData.enquiryType}
       />
 
-      {/* Interactive Home Energy Score Modal */}
-      <HomeEnergyScoreModal
-        isOpen={isEnergyModalOpen}
-        onClose={() => setIsEnergyModalOpen(false)}
-      />
     </div>
   );
 }

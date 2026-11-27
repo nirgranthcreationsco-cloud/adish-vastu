@@ -23,7 +23,7 @@ import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { getShopReturnPath, useCart } from "../context/cartcontext";
 
-type FormField = "name" | "phone" | "address" | "city" | "pincode";
+type FormField = "name" | "phone" | "email" | "address" | "city" | "state" | "pincode";
 
 export default function CheckoutPage() {
   const t = useTranslations("checkout");
@@ -39,16 +39,20 @@ export default function CheckoutPage() {
   const [form, setForm] = useState<Record<FormField, string>>({
     name: "",
     phone: "",
+    email: "",
     address: "",
     city: "",
+    state: "",
     pincode: "",
   });
 
   const [errors, setErrors] = useState<Record<FormField, string>>({
     name: "",
     phone: "",
+    email: "",
     address: "",
     city: "",
+    state: "",
     pincode: "",
   });
 
@@ -85,6 +89,11 @@ export default function CheckoutPage() {
         else if (value.length < 10) msg = t("errPhoneInvalid");
         break;
 
+      case "email":
+        if (!value.trim()) msg = "Email is required";
+        else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) msg = "Enter a valid email";
+        break;
+
       case "address":
         if (!value.trim()) msg = t("errAddressRequired");
         else if (value.length < 10) msg = t("errAddressShort");
@@ -92,6 +101,10 @@ export default function CheckoutPage() {
 
       case "city":
         if (!value.trim()) msg = t("errCityRequired");
+        break;
+
+      case "state":
+        if (!value.trim()) msg = "State is required";
         break;
 
       case "pincode":
@@ -237,16 +250,19 @@ export default function CheckoutPage() {
             id: crypto.randomUUID(),
             name: form.name,
             phone: form.phone,
-            address: form.address,
+            address: `${form.address}, ${form.city}, ${form.state} - ${form.pincode}`,
             city: form.city,
             pincode: form.pincode,
             total: chargedRupees,
             status: "paid",
             cart_items: {
               items: cart,
+              email: form.email,
+              state: form.state,
               coupon: appliedCoupon || null,
               razorpay_order_id: response.razorpay_order_id,
               razorpay_payment_id: response.razorpay_payment_id,
+              product_type: "physical_goods",
             },
           });
 
@@ -266,6 +282,7 @@ export default function CheckoutPage() {
       prefill: {
         name: form.name,
         contact: form.phone,
+        email: form.email,
       },
       theme: {
         color: "#f59e0b",
@@ -355,6 +372,13 @@ export default function CheckoutPage() {
                     onChange={(v) => onChange("phone", v)}
                     placeholder={t("phonePh")}
                   />
+                  <FormField
+                    label="Email"
+                    value={form.email}
+                    error={errors.email}
+                    onChange={(v) => onChange("email", v)}
+                    placeholder="you@example.com"
+                  />
                   <div className="md:col-span-2">
                     <FormField
                       label={t("address")}
@@ -377,6 +401,13 @@ export default function CheckoutPage() {
                     }}
                     show={showSuggestions}
                     placeholder={t("cityPh")}
+                  />
+                  <FormField
+                    label="State"
+                    value={form.state}
+                    error={errors.state}
+                    onChange={(v) => onChange("state", v)}
+                    placeholder="e.g. Gujarat"
                   />
                   <FormField
                     label={t("pincode")}

@@ -17,6 +17,13 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  async redirects() {
+    return [
+      // Legacy service/consultation deep links → physical product shop
+      { source: "/courses", destination: "/shop", permanent: true },
+      { source: "/remedies", destination: "/shop", permanent: false },
+    ];
+  },
 };
 
 export default nextConfig;

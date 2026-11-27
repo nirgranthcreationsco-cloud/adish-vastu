@@ -5,12 +5,11 @@ import {
     Bell,
     ChevronLeft,
     ChevronRight,
-    LayoutDashboard,
-    LogOut,
-    MessageSquare,
-    ShoppingBag,
-    Sparkles,
-    Users
+  LayoutDashboard,
+  LogOut,
+  MessageSquare,
+  ShoppingBag,
+  Sparkles
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -19,8 +18,7 @@ import { useEffect, useState } from "react";
 const sidebarItems = [
   { name: "Dashboard", href: "/admin", icon: LayoutDashboard },
   { name: "Orders", href: "/admin/orders", icon: ShoppingBag },
-  { name: "Energy Leads", href: "/admin/leads", icon: Users },
-  { name: "Contacts", href: "/admin/contacts", icon: MessageSquare },
+  { name: "Product Enquiries", href: "/admin/contacts", icon: MessageSquare },
 ];
 
 export default function AdminLayout({
