@@ -19,11 +19,11 @@ import Image from "next/image";
 
 import { supabase } from "@/supabase";
 import { useRouter } from "next/navigation";
-import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 import { getShopReturnPath, useCart } from "../context/cartcontext";
 
-type FormField = "name" | "phone" | "email" | "address" | "city" | "state" | "pincode";
+type FormField = "name" | "phone" | "address" | "city" | "pincode";
 
 export default function CheckoutPage() {
   const t = useTranslations("checkout");
@@ -39,20 +39,16 @@ export default function CheckoutPage() {
   const [form, setForm] = useState<Record<FormField, string>>({
     name: "",
     phone: "",
-    email: "",
     address: "",
     city: "",
-    state: "",
     pincode: "",
   });
 
   const [errors, setErrors] = useState<Record<FormField, string>>({
     name: "",
     phone: "",
-    email: "",
     address: "",
     city: "",
-    state: "",
     pincode: "",
   });
 
@@ -89,11 +85,6 @@ export default function CheckoutPage() {
         else if (value.length < 10) msg = t("errPhoneInvalid");
         break;
 
-      case "email":
-        if (!value.trim()) msg = "Email is required";
-        else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) msg = "Enter a valid email";
-        break;
-
       case "address":
         if (!value.trim()) msg = t("errAddressRequired");
         else if (value.length < 10) msg = t("errAddressShort");
@@ -101,10 +92,6 @@ export default function CheckoutPage() {
 
       case "city":
         if (!value.trim()) msg = t("errCityRequired");
-        break;
-
-      case "state":
-        if (!value.trim()) msg = "State is required";
         break;
 
       case "pincode":
@@ -193,24 +180,14 @@ export default function CheckoutPage() {
       return;
     }
 
-    // 2. Create order via backend (server recalculates cart + coupon)
-    if (!process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID) {
-      alert("Payment is not configured. Missing Razorpay key.");
-      setIsProcessing(false);
-      return;
-    }
-
+    // 2. Create order via backend
+    const amountInPaise = Math.round(finalTotal * 100);
     let orderData;
     try {
       const orderRes = await fetch("/api/create-order", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          cart,
-          coupon: appliedCoupon || undefined,
-          receipt: form.phone,
-          amount: Math.round(finalTotal * 100),
-        }),
+        body: JSON.stringify({ cart: cart, amount: amountInPaise, receipt: form.phone }),
       });
       orderData = await orderRes.json();
       if (!orderRes.ok) throw new Error(orderData.error || "Failed to create order");
@@ -220,10 +197,10 @@ export default function CheckoutPage() {
       return;
     }
 
-    // 3. Open Razorpay Standard Checkout modal
+    // 3. Open Razorpay modal
     const options = {
-      key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
-      amount: orderData.amount,
+      key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID, // Enter the Key ID generated from the Dashboard
+      amount: orderData.amount, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
       currency: orderData.currency,
       name: "Jain Vastu Solutions",
       description: "Sacred Items Checkout",
@@ -244,26 +221,16 @@ export default function CheckoutPage() {
           if (!verifyRes.ok) throw new Error(verifyData.error || "Verification failed");
 
           // 5. On successful verification, save order to Supabase
-          // Persist charged amount from Razorpay order (authoritative)
-          const chargedRupees = Number(orderData.amount) / 100;
           const { error } = await supabase.from("orders").insert({
             id: crypto.randomUUID(),
             name: form.name,
             phone: form.phone,
-            address: `${form.address}, ${form.city}, ${form.state} - ${form.pincode}`,
+            address: form.address,
             city: form.city,
             pincode: form.pincode,
-            total: chargedRupees,
-            status: "paid",
-            cart_items: {
-              items: cart,
-              email: form.email,
-              state: form.state,
-              coupon: appliedCoupon || null,
-              razorpay_order_id: response.razorpay_order_id,
-              razorpay_payment_id: response.razorpay_payment_id,
-              product_type: "physical_goods",
-            },
+            total: finalTotal,
+            status: "paid", // Mark as paid
+            cart_items: cart,
           });
 
           if (error) {
@@ -282,7 +249,6 @@ export default function CheckoutPage() {
       prefill: {
         name: form.name,
         contact: form.phone,
-        email: form.email,
       },
       theme: {
         color: "#f59e0b",
@@ -372,13 +338,6 @@ export default function CheckoutPage() {
                     onChange={(v) => onChange("phone", v)}
                     placeholder={t("phonePh")}
                   />
-                  <FormField
-                    label="Email"
-                    value={form.email}
-                    error={errors.email}
-                    onChange={(v) => onChange("email", v)}
-                    placeholder="you@example.com"
-                  />
                   <div className="md:col-span-2">
                     <FormField
                       label={t("address")}
@@ -401,13 +360,6 @@ export default function CheckoutPage() {
                     }}
                     show={showSuggestions}
                     placeholder={t("cityPh")}
-                  />
-                  <FormField
-                    label="State"
-                    value={form.state}
-                    error={errors.state}
-                    onChange={(v) => onChange("state", v)}
-                    placeholder="e.g. Gujarat"
                   />
                   <FormField
                     label={t("pincode")}
@@ -570,7 +522,7 @@ export default function CheckoutPage() {
                     )}
                     {appliedCoupon && (
                       <p className="text-[10px] font-bold text-green-600 mt-1.5 flex items-center gap-1">
-                        <CheckCircle2 className="w-3.5 h-3.5" /> {appliedCoupon} — {t("discount")}
+                        <CheckCircle2 className="w-3.5 h-3.5" /> {t("couponApplied", { code: appliedCoupon })}
                       </p>
                     )}
                   </div>
@@ -582,27 +534,27 @@ export default function CheckoutPage() {
                     </div>
                     {hasDiscount && (
                       <div className="flex justify-between items-center text-sm font-bold text-green-600">
-                        <span>{t("discount")} (20%)</span>
+                        <span>{t("promoDiscount")}</span>
                         <span className="tracking-tight">- ₹{discountAmount.toLocaleString('en-IN')}</span>
                       </div>
                     )}
                     <div className="flex justify-between items-center text-sm font-bold text-slate-500">
                       <span>{t("shipping")}</span>
-                      <span className="text-green-600 uppercase tracking-widest text-[10px]">{t("free")}</span>
+                      <span className="text-green-600 uppercase tracking-widest text-[10px]">{t("freeDelivery")}</span>
                     </div>
                   </div>
 
                   <div className="pt-6 border-t border-slate-300">
                     <div className="flex justify-between items-end mb-8">
                       <div>
-                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-1">{t("total")}</p>
+                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-1">{t("grandTotal")}</p>
                         <p className="text-4xl font-black text-slate-900 tracking-tighter">
                           ₹{finalTotal.toLocaleString('en-IN')}
                         </p>
                       </div>
                       <div className="text-right">
                         <p className="text-[10px] font-black text-green-600 uppercase tracking-widest mb-1 flex items-center justify-end gap-1">
-                          <CheckCircle2 className="w-3 h-3" /> {t("authenticValue")}
+                          <CheckCircle2 className="w-3 h-3" /> {t("allInclusive")}
                         </p>
                       </div>
                     </div>
@@ -616,7 +568,7 @@ export default function CheckoutPage() {
                         <span className="animate-pulse">{t("processing")}</span>
                       ) : (
                         <>
-                          {t("placeOrder", { amount: finalTotal.toLocaleString("en-IN") })}
+                          {t("completeOrder")}
                           <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                         </>
                       )}

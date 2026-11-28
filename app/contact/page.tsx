@@ -5,50 +5,54 @@ import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Contact Us",
-  description: `Call or WhatsApp ${BUSINESS.brandName} at ${BUSINESS.phoneDisplay} for product and order support.`,
+  description: `Contact ${BUSINESS.brandName} for order support, shipping queries, and grievance redressal regarding physical product purchases.`,
 };
 
 export default function ContactPage() {
+  const mailto = `mailto:${BUSINESS.email}`;
   const tel = `tel:+${BUSINESS.phoneE164}`;
 
   return (
     <PolicyLayout
       title="Contact Us"
-      description="Small business support for physical product orders — call or WhatsApp us on the number below."
+      description="We're here to help with orders, deliveries, and product-related questions. This store sells physical products only."
     >
       <PolicySection title="Customer support">
         <p>
-          For product questions, order status, shipping, returns, or
-          cancellations, please call or message us during working hours. We are
-          a small business and respond as quickly as we can.
+          For questions about products, order status, shipping, returns, or
+          cancellations, please reach us during working hours. We respond to
+          emails as quickly as possible; response times may be longer on
+          Sundays and public holidays.
         </p>
         <ul className="mt-4 space-y-3 rounded-xl border border-amber-200/80 bg-white/70 p-5 text-stone-800 shadow-sm">
           <li>
             <span className="block text-xs font-semibold uppercase tracking-wide text-amber-800">
-              Phone / WhatsApp
+              Email
             </span>
             <a
-              href={tel}
-              className="text-lg font-bold text-amber-900 underline-offset-2 hover:underline"
+              href={mailto}
+              className="font-medium text-amber-900 underline-offset-2 hover:underline"
             >
-              {BUSINESS.phoneDisplay}
+              {BUSINESS.email}
             </a>
-            <div className="mt-2">
-              <a
-                href={BUSINESS.whatsappUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex rounded-lg bg-[#25D366] px-3 py-1.5 text-xs font-bold text-white hover:opacity-90"
-              >
-                Chat on WhatsApp
-              </a>
-            </div>
           </li>
           <li>
             <span className="block text-xs font-semibold uppercase tracking-wide text-amber-800">
-              Location
+              Phone
+            </span>
+            <a
+              href={tel}
+              className="font-medium text-amber-900 underline-offset-2 hover:underline"
+            >
+              {BUSINESS.phoneDisplay}
+            </a>
+          </li>
+          <li>
+            <span className="block text-xs font-semibold uppercase tracking-wide text-amber-800">
+              Address
             </span>
             {BUSINESS.addressLine}
+            {/* OWNER CONFIRMATION: full registered / dispatch address with PIN code */}
           </li>
           <li>
             <span className="block text-xs font-semibold uppercase tracking-wide text-amber-800">
@@ -59,14 +63,16 @@ export default function ContactPage() {
         </ul>
       </PolicySection>
 
-      <PolicySection title="Order & product help">
+      <PolicySection title="Order &amp; product enquiries">
         <p>
-          When you message us, please share your order ID (if any), product
-          name, and a short note. We sell physical Vastu and religious products
-          only — we do not offer paid consultations or astrology services.
+          When you write to us, please include your order ID (if applicable),
+          the product name, and a brief description of your request. We do not
+          provide paid Vastu consultations, astrology, or bespoke advisory
+          services through this channel—only support related to physical
+          product purchases.
         </p>
         <p>
-          Continue shopping on{" "}
+          You can also continue shopping on{" "}
           <Link
             href="/shop"
             className="font-medium text-amber-800 underline-offset-2 hover:underline"
@@ -78,12 +84,73 @@ export default function ContactPage() {
       </PolicySection>
 
       <PolicySection title="Grievance redressal">
+        {BUSINESS.grievanceOfficer ? (
+          <p>
+            For unresolved complaints relating to your purchase, you may contact
+            our designated grievance officer: {BUSINESS.grievanceOfficer}.
+          </p>
+        ) : (
+          <p>
+            If your concern has not been resolved through regular customer
+            support, you may lodge a grievance by writing to{" "}
+            <a
+              href={mailto}
+              className="font-medium text-amber-800 underline-offset-2 hover:underline"
+            >
+              {BUSINESS.email}
+            </a>{" "}
+            with the subject line <strong>Grievance – Order</strong> and
+            include your order ID, purchase date, and a summary of the issue.
+            We will acknowledge grievances typically within 1–3 business days;
+            resolution timelines may vary depending on the nature of the
+            complaint and any third-party logistics involvement.
+          </p>
+        )}
+        {/* OWNER CONFIRMATION: designated grievance officer name & email if legally required */}
+        <p className="text-sm text-stone-600">
+          This grievance process applies to transactions for physical products
+          on this website only.
+        </p>
+      </PolicySection>
+
+      <PolicySection title="Policies">
         <p>
-          For complaints about an order or delivery, call or WhatsApp{" "}
-          <a href={tel} className="font-semibold text-amber-900">
-            {BUSINESS.phoneDisplay}
-          </a>
-          . We will record your concern and work to resolve it promptly.
+          Please review our{" "}
+          <Link
+            href="/policies/terms"
+            className="font-medium text-amber-800 underline-offset-2 hover:underline"
+          >
+            Terms &amp; Conditions
+          </Link>
+          ,{" "}
+          <Link
+            href="/policies/privacy"
+            className="font-medium text-amber-800 underline-offset-2 hover:underline"
+          >
+            Privacy Policy
+          </Link>
+          ,{" "}
+          <Link
+            href="/policies/shipping"
+            className="font-medium text-amber-800 underline-offset-2 hover:underline"
+          >
+            Shipping Policy
+          </Link>
+          ,{" "}
+          <Link
+            href="/policies/returns"
+            className="font-medium text-amber-800 underline-offset-2 hover:underline"
+          >
+            Returns &amp; Refunds
+          </Link>
+          , and{" "}
+          <Link
+            href="/policies/cancellation"
+            className="font-medium text-amber-800 underline-offset-2 hover:underline"
+          >
+            Cancellation Policy
+          </Link>
+          .
         </p>
       </PolicySection>
     </PolicyLayout>

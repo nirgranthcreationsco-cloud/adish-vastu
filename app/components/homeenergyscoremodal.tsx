@@ -488,14 +488,21 @@ export default function HomeEnergyScoreModal({
             <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
               <button 
                 onClick={() => {
-                    router.push(`/?service=vastu&msg=Personalized%20Correction%20Consultation%20(Energy%20Score:%20${score})#consultation-form`);
+                    router.push(`/?service=remedies&msg=Home%20Energy%20Score%20${score}%20-%20Product%20Enquiry#contact-form`);
                     handleClose();
                 }}
                 className="px-10 py-4 bg-slate-900 text-white font-black text-[10px] uppercase tracking-[0.3em] rounded-2xl shadow-2xl shadow-slate-900/10 hover:scale-105 active:scale-95 transition-all"
               >
                 {t("success.bookCta")}
               </button>
-              <button className="px-10 py-4 bg-[#25D366] text-white font-black text-[10px] uppercase tracking-[0.3em] rounded-2xl shadow-2xl shadow-green-500/20 hover:scale-105 active:scale-95 transition-all">
+              <button
+                type="button"
+                onClick={() => {
+                  router.push("/#remedies");
+                  handleClose();
+                }}
+                className="px-10 py-4 bg-amber-500 text-white font-black text-[10px] uppercase tracking-[0.3em] rounded-2xl shadow-2xl shadow-amber-500/20 hover:scale-105 active:scale-95 transition-all"
+              >
                 {t("success.whatsappCta")}
               </button>
             </div>

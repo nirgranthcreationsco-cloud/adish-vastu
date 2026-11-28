@@ -147,16 +147,18 @@ export async function GET(request: Request) {
             });
         }
 
-        // Fetch ALL folders/files from the specified folder with pagination
+        // Fetch folders/files with pagination (cap pages so Gem Stone never hangs forever)
         let allFiles: any[] = [];
         let pageToken: string | undefined = undefined;
+        let pages = 0;
+        const MAX_PAGES = 3;
 
         do {
             const response: any = await drive.files.list({
                 q: `'${folderId}' in parents and trashed=false`,
                 fields: 'nextPageToken, files(id, name, mimeType, thumbnailLink, webViewLink, webContentLink, imageMediaMetadata)',
                 orderBy: 'name',
-                pageSize: 1000, // Maximum allowed by Google Drive API
+                pageSize: 200,
                 pageToken: pageToken,
             });
 
@@ -165,7 +167,8 @@ export async function GET(request: Request) {
             }
 
             pageToken = response.data.nextPageToken || undefined;
-        } while (pageToken);
+            pages += 1;
+        } while (pageToken && pages < MAX_PAGES);
 
         console.log(`✅ Fetched ${allFiles.length} items from folder ${folderId}`);
 

@@ -49,7 +49,7 @@ export default function FinalCTAAndFooter() {
         }));
         
         // Scroll to form if it's a contextual link
-        const element = document.getElementById('consultation-form');
+        const element = document.getElementById("contact-form");
         if (element) {
             element.scrollIntoView({ behavior: 'smooth' });
         }
@@ -227,7 +227,7 @@ const handleSubmit = async (e: React.MouseEvent) => {
           </div>
 
           {/* RIGHT SIDE – FORM */}
-          <div className="relative" id="consultation-form">
+          <div className="relative" id="contact-form">
             <div className="absolute -inset-4 bg-gradient-to-br from-amber-500/20 to-orange-500/20 blur-3xl rounded-3xl" />
 
             <div className="relative bg-[#ffffff] backdrop-blur-xl border border-amber-200 rounded-[2.5rem] p-8 md:p-12 shadow-2xl">

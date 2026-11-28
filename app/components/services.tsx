@@ -56,7 +56,7 @@ export default function ServicesSection() {
   ];
 
   const handleConsult = (slug: string, title: string) => {
-    router.push(`/?service=${slug}&msg=${encodeURIComponent(title)}%20Consultation#consultation-form`);
+    router.push(`/?service=${slug}&msg=${encodeURIComponent(title)}%20-%20Contact%20Aadish%20(free%20product%20help)#contact-form`);
   };
 
   return (

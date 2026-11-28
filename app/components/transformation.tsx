@@ -135,7 +135,7 @@ export default function TransformationStories() {
                 </blockquote>
 
                 <button 
-                    onClick={() => router.push(`/?service=vastu&msg=Transformation%20Story%20Inquiry%20from%20${encodeURIComponent(s.name)}#consultation-form`)}
+                    onClick={() => router.push(`/?service=vastu&msg=Transformation%20Story%20Inquiry%20from%20${encodeURIComponent(s.name)}#contact-form`)}
                     className="px-8 py-4 bg-slate-900 text-white font-black text-[10px] uppercase tracking-[0.2em] rounded-2xl shadow-2xl shadow-slate-900/10 hover:scale-105 active:scale-95 transition-all flex items-center gap-2 group"
                 >
                   {t('bookCta')}

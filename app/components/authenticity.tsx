@@ -106,7 +106,7 @@ export default function AuthenticityGuaranteeSection() {
           <button
             onClick={() =>
               router.push(
-                "/?service=remedies&msg=Cerificate%20Verification%20and%20Authenticity%20Query#consultation-form"
+                "/?service=remedies&msg=Cerificate%20Verification%20and%20Authenticity%20Query#contact-form"
               )
             }
             className="px-10 py-5 bg-slate-900 text-white font-black text-[10px] uppercase tracking-[0.3em] rounded-2xl shadow-2xl shadow-slate-900/10 hover:scale-105 active:scale-95 transition-all"

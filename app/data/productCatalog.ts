@@ -3882,12 +3882,64 @@ export function getProductByName(name: string): CatalogProduct | undefined {
   return productCatalog.find(p => p.name.toLowerCase().replace(/\s+/g, '') === norm);
 }
 
+/**
+ * Normalize Drive / URL category names to catalog categories.
+ * Handles live Drive typo: "Stone Barcelet"
+ */
+export function resolveCatalogCategory(categoryName: string): string {
+  const compact = categoryName
+    .toLowerCase()
+    .trim()
+    .replace(/[-_]+/g, " ")
+    .replace(/\s+/g, " ");
+  const nospace = compact.replace(/\s+/g, "");
+
+  if (
+    nospace.includes("bracelet") ||
+    nospace.includes("barcelet") ||
+    nospace.includes("braclet") ||
+    nospace.includes("bead")
+  ) {
+    return "Stone Bracelets";
+  }
+  if (nospace.includes("statue") || nospace.includes("murti") || nospace.includes("idol")) {
+    return "Vastu Statue";
+  }
+  if (nospace.includes("gem")) {
+    return "Gem Stone";
+  }
+  if (nospace.includes("remedy") || nospace.includes("yantra") || nospace === "vasturemedies") {
+    return "Vastu Remedies";
+  }
+
+  const aliases: Record<string, string> = {
+    gemstone: "Gem Stone",
+    gemstones: "Gem Stone",
+    "gem stone": "Gem Stone",
+    stonebracelets: "Stone Bracelets",
+    stonebracelet: "Stone Bracelets",
+    stonebarcelet: "Stone Bracelets",
+    stonebarcelets: "Stone Bracelets",
+    "stone bracelets": "Stone Bracelets",
+    "stone bracelet": "Stone Bracelets",
+    "stone barcelet": "Stone Bracelets",
+    vasturemedies: "Vastu Remedies",
+    "vastu remedies": "Vastu Remedies",
+    vastustatue: "Vastu Statue",
+    vastustatues: "Vastu Statue",
+    "vastu statue": "Vastu Statue",
+    "vastu statues": "Vastu Statue",
+  };
+
+  return aliases[compact] || aliases[nospace] || categoryName.trim();
+}
+
+/** Strict category match — avoids Gem Stone ↔ Stone Bracelets cross-bleed */
 export function getProductsByCategory(categoryName: string): CatalogProduct[] {
-  const norm = categoryName.toLowerCase().replace(/[-_\s]/g, '');
-  return productCatalog.filter(p => {
-    const pNorm = p.category.toLowerCase().replace(/[-_\s]/g, '');
-    return pNorm === norm || pNorm.includes(norm) || norm.includes(pNorm);
-  });
+  const canonical = resolveCatalogCategory(categoryName);
+  const canonNorm = canonical.toLowerCase();
+
+  return productCatalog.filter((p) => p.category.toLowerCase().trim() === canonNorm);
 }
 
 export function getPriceForVariant(productName: string, variantOption?: string): { b2c: number | string | null; b2b: number | string | null } {

@@ -14,9 +14,13 @@ export default function OrderSuccess() {
           <CheckCircle2 className="w-10 h-10" />
         </div>
 
-        <h1 className="text-3xl font-bold text-amber-900">{t("title")}</h1>
+        <h1 className="text-3xl font-bold text-amber-900 product-title">
+          {t("title")}
+        </h1>
 
-        <p className="text-amber-700 text-base leading-relaxed">{t("message")}</p>
+        <p className="text-amber-700 text-base leading-relaxed">
+          {t("message")}
+        </p>
 
         <div className="space-y-3">
           <Link

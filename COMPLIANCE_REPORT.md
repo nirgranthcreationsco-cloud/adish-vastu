@@ -85,7 +85,7 @@ All linked from site footer:
 - Shipping & Delivery (cautious timelines; owner must confirm actual SLAs)
 - Returns & Refunds
 - Cancellation Policy
-- Contact / grievance via phone / WhatsApp only: +91 81036 38945 (no public email)
+- Contact / grievance via support email (no invented officer name)
 
 ---
 
@@ -109,8 +109,8 @@ Do **not** invent these. Update `app/data/business.ts` when confirmed:
 
 1. Registered legal entity name (if different from brand)
 2. Full registered / shipping address with PIN code
-3. Support phone confirmed: `+91 81036 38945` (phone / WhatsApp only; no public email)
-4. ~~Support email~~ — not used (small business; phone-only contact)
+3. Verified support phone (current footer uses `+91 98765 43210` — appears placeholder)
+4. Verified support email (`support@adishacademy.in` — confirm)
 5. GSTIN (if registered)
 6. Named grievance officer (if legally required for your category)
 7. Exact processing / delivery / return window in days

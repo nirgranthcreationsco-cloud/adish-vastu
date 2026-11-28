@@ -153,7 +153,7 @@ export default function TermsPage() {
 
       <PolicySection title="10. Contact">
         <p>
-          Call / WhatsApp {BUSINESS.phoneDisplay} · {BUSINESS.workingHours}
+          {BUSINESS.email} · {BUSINESS.phoneDisplay} · {BUSINESS.workingHours}
         </p>
       </PolicySection>
     </PolicyLayout>

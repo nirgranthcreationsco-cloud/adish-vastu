@@ -33,11 +33,12 @@ body {
   letter-spacing: -0.011em;
 }
 
-/* Hindi / Devanagari — Flipkart/Amazon-IN style readability */
+/* Hindi / Devanagari — Flipkart / Amazon.in style readability */
 html.locale-hi body {
-  line-height: 1.8;
+  line-height: 1.85;
   letter-spacing: 0;
-  word-spacing: 0.02em;
+  word-spacing: 0.03em;
+  font-weight: 400;
 }
 
 html.locale-hi h1,
@@ -46,8 +47,36 @@ html.locale-hi h3,
 html.locale-hi h4,
 html.locale-hi h5,
 html.locale-hi h6 {
-  line-height: 1.45;
+  line-height: 1.5;
   letter-spacing: 0;
+  font-weight: 700;
+  word-spacing: 0.02em;
+}
+
+/* Uppercase + wide tracking looks broken on Devanagari — neutralize like big IN ecoms */
+html.locale-hi .uppercase {
+  text-transform: none;
+  letter-spacing: 0.01em;
+}
+
+html.locale-hi .tracking-widest,
+html.locale-hi .tracking-wider,
+html.locale-hi .tracking-\[0\.2em\],
+html.locale-hi .tracking-\[0\.1em\] {
+  letter-spacing: 0.01em;
+}
+
+html.locale-hi button,
+html.locale-hi a,
+html.locale-hi label,
+html.locale-hi input,
+html.locale-hi select,
+html.locale-hi textarea {
+  line-height: 1.7;
+  letter-spacing: 0;
+}
+
+html.locale-hi .font-black {
   font-weight: 700;
 }
 

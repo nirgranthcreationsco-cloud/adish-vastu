@@ -1,9 +1,8 @@
 import type { Metadata } from "next";
 import { Noto_Sans_Devanagari, Plus_Jakarta_Sans } from "next/font/google";
-import { BUSINESS } from "./data/business";
+import LanguageSwitcher from "./components/languageswitcher";
 import LocaleProvider from "./components/localeprovider";
-import SiteFooter from "./components/sitefooter";
-import SiteHeader from "./components/siteheader";
+import PromoBanner from "./components/promobanner";
 import { CartProvider } from "./context/cartcontext";
 import "./globals.css";
 
@@ -23,30 +22,34 @@ const notoDevanagari = Noto_Sans_Devanagari({
 
 export const metadata: Metadata = {
   title: {
-    default: `${BUSINESS.brandName} | Physical Vastu & Religious Products`,
-    template: `%s | ${BUSINESS.brandName}`,
+    default: "Jain Vastu Solution",
+    template: "%s | Jain Vastu Solution",
   },
   description:
-    "Shop physical Vastu products, religious articles, gemstones, stone bracelets, and statues. Transparent INR pricing, secure Razorpay checkout, and pan-India shipping.",
+    "Buy authentic physical Vastu products, gemstones, stone bracelets, and statues from Jain Vastu Solutions. Secure online checkout for physical goods only.",
   keywords: [
-    "Vastu products",
-    "religious articles",
-    "gemstones",
+    "Vastu remedies",
+    "buy vastu products",
+    "Aadish Jain",
+    "buy vastu yantra",
+    "gem stones",
     "stone bracelets",
-    "Vastu statues",
-    "buy Vastu remedies online",
-    "Jain Vastu Solutions",
+    "vastu statues",
   ],
   robots: {
     index: true,
     follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+    },
   },
   openGraph: {
-    title: `${BUSINESS.brandName} | Physical Products Store`,
+    title: "Jain Vastu Solution",
     description:
-      "Authentic physical Vastu and religious products with clear pricing and secure online checkout.",
+      "Physical Vastu products, gemstones, bracelets & statues — secure online shopping.",
     url: "https://vastuacademy.com",
-    siteName: BUSINESS.brandName,
+    siteName: "Jain Vastu Solution",
     locale: "en_IN",
     type: "website",
   },
@@ -63,14 +66,15 @@ export default function RootLayout({
   return (
     <html lang="en" className="locale-en">
       <body
-        className={`${plusJakarta.variable} ${notoDevanagari.variable} antialiased bg-[#FFFCFA] text-stone-900`}
+        className={`${plusJakarta.variable} ${notoDevanagari.variable} antialiased bg-orange-50`}
       >
         <LocaleProvider>
-          <CartProvider>
-            <SiteHeader />
-            {children}
-            <SiteFooter />
-          </CartProvider>
+          <PromoBanner />
+          {/* Global language control — left so it never fights the cart button */}
+          <div className="fixed top-12 left-3 z-[60] md:top-14 md:left-6">
+            <LanguageSwitcher />
+          </div>
+          <CartProvider>{children}</CartProvider>
         </LocaleProvider>
       </body>
     </html>

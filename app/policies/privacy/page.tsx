@@ -124,12 +124,12 @@ export default function PrivacyPage() {
           Subject to applicable Indian law (including the Digital Personal Data
           Protection Act, 2023, where applicable), you may request access,
           correction, or deletion of certain personal data, or withdraw consent
-          where processing is consent-based. Call or WhatsApp us at{" "}
+          where processing is consent-based. Contact us at{" "}
           <a
-            href={`tel:+${BUSINESS.phoneE164}`}
+            href={`mailto:${BUSINESS.email}`}
             className="font-medium text-amber-800 underline-offset-2 hover:underline"
           >
-            {BUSINESS.phoneDisplay}
+            {BUSINESS.email}
           </a>
           . We will respond typically within 1–3 business days; complex
           requests may take longer.

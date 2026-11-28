@@ -93,7 +93,7 @@ export default function ActivationGuidesSection() {
 
               {/* CTA */}
               <button 
-                onClick={() => router.push(`/?service=remedies&msg=${encodeURIComponent(guide.title)}%20Activation%20Guide#consultation-form`)}
+                onClick={() => router.push(`/?service=remedies&msg=${encodeURIComponent(guide.title)}%20Activation%20Guide#contact-form`)}
                 className="w-full px-6 py-4 bg-slate-900 text-white font-black text-[10px] uppercase tracking-[0.2em] rounded-xl shadow-lg hover:shadow-xl transition flex items-center justify-center gap-2"
               >
                 View Full Guide
@@ -107,18 +107,18 @@ export default function ActivationGuidesSection() {
       {/* Final CTA */}
       <div className="relative z-10 max-w-4xl mx-auto px-6 text-center mt-24">
         <h3 className="text-3xl text-slate-900 font-bold mb-4">
-          Want Personalized Guidance for Activation?
+          Need help placing a product?
         </h3>
 
         <p className="text-lg text-slate-700 mb-8 max-w-2xl mx-auto">
-          Book a session where Aadish Jain personally guides you through rituals, placements and corrections for your home.
+          Message Aadish free for product placement tips. Payments on this site are only for physical products — never for advice.
         </p>
 
         <button 
-            onClick={() => router.push('/?service=vastu&msg=Personalized%20Ritual%20Session%20Booking#consultation-form')}
+            onClick={() => router.push('/?service=remedies&msg=Product%20placement%20help%20-%20Contact%20Aadish#contact-form')}
             className="px-12 py-5 bg-gradient-to-r from-amber-500 to-orange-600 text-white font-black text-xs uppercase tracking-[0.3em] rounded-2xl shadow-2xl shadow-amber-500/20 hover:scale-105 active:scale-95 transition-all flex items-center gap-3 mx-auto group"
         >
-          Book 1-on-1 Ritual Session
+          Contact Aadish
           <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
         </button>
       </div>

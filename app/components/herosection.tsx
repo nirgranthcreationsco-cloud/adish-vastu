@@ -9,8 +9,9 @@ import HomeEnergyScoreModal from "./homeenergyscoremodal";
 
 export default function HeroSection() {
   const t = useTranslations('hero');
-  const tc = useTranslations('common');
+  const tCommon = useTranslations('common');
   const router = useRouter();
+  // locale switcher lives globally in layout
   const [isVisible, setIsVisible] = useState(false);
   const [energyScoreOpen, setEnergyScoreOpen] = useState(false);
   const [particles, setParticles] = useState<Array<{ left: string; top: string; delay: string; duration: string }>>([]);
@@ -34,7 +35,6 @@ export default function HeroSection() {
   return (
     <>
     <section className="relative flex items-center justify-center overflow-hidden pt-14 pb-8 md:pt-16 md:pb-10">
-
 
       {/* --- BACKGROUND LAYERS --- */}
       <div className="absolute inset-0 overflow-hidden">
@@ -134,7 +134,7 @@ export default function HeroSection() {
               </button>
 
               <button
-                onClick={() => router.push('/?service=vastu&msg=Hero%20Section%20Consultation#consultation-form')}
+                onClick={() => router.push('/?service=remedies&msg=Contact%20Aadish%20-%20free%20product%20help#contact-form')}
                 className="px-6 py-3.5 bg-white hover:bg-amber-50 text-amber-900 font-semibold rounded-xl border border-amber-300 transition-all hover:scale-105"
               >
                 {t('cta1')}
@@ -195,8 +195,8 @@ export default function HeroSection() {
                     <Sparkles className="w-3.5 h-3.5 animate-pulse" />
                   </div>
                   <div className="text-left">
-                    <p className="text-[9px] uppercase tracking-wider text-slate-500 font-bold">{tc('approach')}</p>
-                    <p className="text-[11px] font-black text-slate-800">{tc('scientific')}</p>
+                    <p className="text-[9px] uppercase tracking-wider text-slate-500 font-bold">{tCommon('approach')}</p>
+                    <p className="text-[11px] font-black text-slate-800">{tCommon('scientific')}</p>
                   </div>
                 </div>
 
@@ -205,8 +205,8 @@ export default function HeroSection() {
                     <Award className="w-3.5 h-3.5" />
                   </div>
                   <div className="text-left">
-                    <p className="text-[9px] uppercase tracking-wider text-slate-500 font-bold">{tc('remedies')}</p>
-                    <p className="text-[11px] font-black text-slate-800">{tc('personallyEnergized')}</p>
+                    <p className="text-[9px] uppercase tracking-wider text-slate-500 font-bold">{tCommon('remedies')}</p>
+                    <p className="text-[11px] font-black text-slate-800">{tCommon('personallyEnergized')}</p>
                   </div>
                 </div>
               </>

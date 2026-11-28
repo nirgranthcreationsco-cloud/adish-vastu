@@ -1,15 +1,17 @@
 "use client";
 
-import { ArrowLeft, Loader2, Package, ShoppingCart, Search, Sparkles, HelpCircle, MessageCircle, Info, ChevronRight, ShieldCheck } from "lucide-react";
+import { ArrowLeft, Loader2, Package, ShoppingCart, Search, Sparkles, HelpCircle, MessageCircle, Info, ChevronRight, Compass, ShieldCheck } from "lucide-react";
 import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
-import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 import FloatingCart from "../../components/floatingcart";
 import { setShopReturnPath, useCart } from "../../context/cartcontext";
-import { productCatalog, CatalogProduct, matchDriveItemToCatalog, getProductStatus, ProductStatus, getProductsByCategory } from "@/app/data/productCatalog";
+import { getCategoryImage, normalizeCategoryName } from "@/app/data/business";
+import { CatalogProduct, matchDriveItemToCatalog, getProductStatus, ProductStatus, getProductsByCategory, resolveCatalogCategory } from "@/app/data/productCatalog";
 import ProductEnquiryModal from "../../components/productenquirymodal";
 import ProductDetailModal from "../../components/productdetailmodal";
+import HomeEnergyScoreModal from "../../components/homeenergyscoremodal";
 
 interface DriveItem {
   id: string;
@@ -27,23 +29,6 @@ interface Product {
   price: string;
   category: string;
   catalogItem?: CatalogProduct;
-}
-
-function getCategoryHeroBanner(name: string): string | null {
-  const normalized = name.toLowerCase();
-  if (normalized.includes('statue')) {
-    return '/categories/vastu-statues.jpg';
-  }
-  if (normalized.includes('gem') || (normalized.includes('stone') && !normalized.includes('bracelet'))) {
-    return '/categories/gem-stone.jpg';
-  }
-  if (normalized.includes('bracelet')) {
-    return '/categories/stone-bracelets.jpg';
-  }
-  if (normalized.includes('remedy') || normalized.includes('remedies') || normalized.includes('vastu')) {
-    return '/categories/vastu-remedies.jpg';
-  }
-  return null;
 }
 
 export default function CategoryPage() {
@@ -67,17 +52,21 @@ export default function CategoryPage() {
     productName: string;
     categoryName: string;
     selectedVariant?: string;
-    enquiryType: "price_request" | "consultation_request";
+    enquiryType: "price_request" | "product_enquiry";
   }>({
     isOpen: false,
     productName: "",
     categoryName: "",
     enquiryType: "price_request",
   });
+  const [isEnergyModalOpen, setIsEnergyModalOpen] = useState(false);
   const [allCategories, setAllCategories] = useState<{ id: string; name: string }[]>([]);
 
   const categoryId = params.categoryId as string;
-  const categoryName = decodeURIComponent(categoryId).replace(/-/g, ' ');
+  const rawCategoryName = decodeURIComponent(categoryId).replace(/-/g, " ");
+  // Canonical name (fixes Drive typo "Stone Barcelet" → Stone Bracelets)
+  const categoryName = resolveCatalogCategory(rawCategoryName) || normalizeCategoryName(rawCategoryName);
+  const categoryBanner = getCategoryImage(categoryName);
 
   useEffect(() => {
     fetchProducts();
@@ -90,116 +79,169 @@ export default function CategoryPage() {
     }
   }, [categoryId]);
 
-  const fetchProducts = async () => {
+  const applyProductList = (list: Product[]) => {
+    setProducts(list);
+    const initialVariants: Record<string, string> = {};
+    list.forEach((p) => {
+      if (p.catalogItem && p.catalogItem.variants.length > 0) {
+        initialVariants[p.id] = p.catalogItem.variants[0].option;
+      }
+    });
+    setSelectedVariants(initialVariants);
+  };
+
+  const buildCatalogProducts = (): Product[] => {
+    return getProductsByCategory(categoryName).map((catProd, idx) => ({
+      id: catProd.id || `cat-prod-${idx}`,
+      name: catProd.name,
+      image: catProd.image || "/sacred_remedies.png",
+      price: "",
+      category: catProd.category || categoryName,
+      catalogItem: catProd,
+    }));
+  };
+
+  const fetchWithTimeout = async (url: string, ms = 8000) => {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), ms);
     try {
+      const res = await fetch(url, { signal: controller.signal });
+      return await res.json();
+    } finally {
+      clearTimeout(timer);
+    }
+  };
+
+  const fetchProducts = async () => {
+    setError(null);
+
+    // 1) Catalog-first — show products immediately (never stuck on Drive)
+    const catalogList = buildCatalogProducts();
+    applyProductList(catalogList);
+    setLoading(false);
+
+    if (catalogList.length === 0) {
+      // Still try Drive; if both empty, show empty state (not infinite spinner)
       setLoading(true);
-      setError(null);
+    }
 
-      // Fetch category folders from drive API
-      const mainResponse = await fetch('/api/drive');
-      const mainData = await mainResponse.json();
-
+    try {
+      const mainData = await fetchWithTimeout("/api/drive", 8000);
       let driveItems: DriveItem[] = [];
 
-      if (mainData.success && mainData.items) {
-        // Store all category folders for quick switching
+      if (mainData?.success && Array.isArray(mainData.items)) {
         const catFolders = mainData.items
-          .filter((item: DriveItem) => item.mimeType === 'application/vnd.google-apps.folder')
+          .filter(
+            (item: DriveItem) =>
+              item.mimeType === "application/vnd.google-apps.folder"
+          )
           .map((item: DriveItem) => ({ id: item.id, name: item.name }));
-        setAllCategories(catFolders);
+        setAllCategories(catFolders.length ? catFolders : [
+          { id: "gem-stone", name: "Gem Stone" },
+          { id: "stone-bracelets", name: "Stone Bracelets" },
+          { id: "vastu-remedies", name: "Vastu Remedies" },
+          { id: "vastu-statue", name: "Vastu Statue" },
+        ]);
 
-        // Find the matching category folder
-        const categoryFolder = mainData.items.find(
-          (item: DriveItem) =>
-            item.mimeType === 'application/vnd.google-apps.folder' &&
-            item.name.toLowerCase() === categoryName.toLowerCase()
-        );
+        const targetCanon = resolveCatalogCategory(categoryName).toLowerCase();
+        const categoryFolder = mainData.items.find((item: DriveItem) => {
+          if (item.mimeType !== "application/vnd.google-apps.folder") return false;
+          return (
+            resolveCatalogCategory(item.name).toLowerCase() === targetCanon ||
+            item.name.toLowerCase() === rawCategoryName.toLowerCase()
+          );
+        });
 
         if (categoryFolder) {
-          // Fetch products from this category folder
-          const productsResponse = await fetch(`/api/drive?folderId=${categoryFolder.id}`);
-          const productsData = await productsResponse.json();
-          if (productsData.success && productsData.items) {
+          const productsData = await fetchWithTimeout(
+            `/api/drive?folderId=${categoryFolder.id}`,
+            10000
+          );
+          if (productsData?.success && Array.isArray(productsData.items)) {
             driveItems = productsData.items;
           }
         }
+      } else if (catalogList.length === 0) {
+        setAllCategories([
+          { id: "gem-stone", name: "Gem Stone" },
+          { id: "stone-bracelets", name: "Stone Bracelets" },
+          { id: "vastu-remedies", name: "Vastu Remedies" },
+          { id: "vastu-statue", name: "Vastu Statue" },
+        ]);
       }
 
-      // Filter drive items to only valid images
-      const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.bmp', '.svg', '.heic', '.heif'];
+      const imageExtensions = [
+        ".jpg", ".jpeg", ".png", ".gif", ".webp", ".bmp", ".svg", ".heic", ".heif",
+      ];
       const driveImages = driveItems.filter((item: DriveItem) => {
         const fileName = item.name.toLowerCase();
-        return imageExtensions.some(ext => fileName.endsWith(ext)) || item.mimeType.startsWith('image/');
+        return (
+          imageExtensions.some((ext) => fileName.endsWith(ext)) ||
+          (item.mimeType || "").startsWith("image/")
+        );
       });
 
-      // 1. Get all Excel Master Catalog products belonging to this category
-      const catalogProductsForCategory = getProductsByCategory(categoryName);
-      
+      if (driveImages.length === 0) {
+        if (catalogList.length === 0) {
+          setError(null);
+          applyProductList([]);
+        }
+        return;
+      }
+
       const reconciledMap = new Map<string, Product>();
+      catalogList.forEach((p) => reconciledMap.set(p.name.toLowerCase(), { ...p }));
 
-      // First, map every master Excel catalog product to ensure 100% presence
-      catalogProductsForCategory.forEach((catProd, idx) => {
-        reconciledMap.set(catProd.name.toLowerCase(), {
-          id: catProd.id || `cat-prod-${idx}`,
-          name: catProd.name,
-          image: catProd.image || "/sacred_remedies.png",
-          price: "",
-          category: categoryName,
-          catalogItem: catProd,
-        });
-      });
-
-      // Second, overlay Drive images & items into the catalog
-      driveImages.forEach((item: DriveItem) => {
-        const baseName = item.name.replace(/\.[^/.]+$/, '').trim();
+      // Cap Drive matching work so huge folders never freeze the UI
+      const capped = driveImages.slice(0, 200);
+      capped.forEach((item: DriveItem) => {
+        const baseName = item.name.replace(/\.[^/.]+$/, "").trim();
         const match = matchDriveItemToCatalog(baseName);
         const imageUrl = `https://drive.google.com/thumbnail?id=${item.id}&sz=w800`;
 
         if (match.product) {
+          // Only overlay if product belongs to this category
+          const matchCat = (match.product.category || "")
+            .toLowerCase()
+            .replace(/[-_\s]/g, "");
+          const pageCat = categoryName.toLowerCase().replace(/[-_\s]/g, "");
+          if (matchCat && matchCat !== pageCat) return;
+
           const key = match.product.name.toLowerCase();
           const existing = reconciledMap.get(key);
           if (existing) {
             existing.image = imageUrl;
-          } else {
+          } else if (matchCat === pageCat || !matchCat) {
             reconciledMap.set(key, {
               id: match.product.id || item.id,
               name: match.product.name,
               image: imageUrl,
               price: "",
-              category: categoryName,
+              category: match.product.category || categoryName,
               catalogItem: match.product,
             });
           }
-        } else {
-          // Additional Drive item not in structured list
-          const key = baseName.toLowerCase();
-          if (!reconciledMap.has(key)) {
-            reconciledMap.set(key, {
-              id: item.id,
-              name: baseName,
-              image: imageUrl,
-              price: "",
-              category: categoryName,
-              catalogItem: undefined,
-            });
-          }
+        } else if (!reconciledMap.has(baseName.toLowerCase()) && catalogList.length === 0) {
+          reconciledMap.set(baseName.toLowerCase(), {
+            id: item.id,
+            name: baseName,
+            image: imageUrl,
+            price: "",
+            category: categoryName,
+            catalogItem: undefined,
+          });
         }
       });
 
-      const finalProductList = Array.from(reconciledMap.values());
-      setProducts(finalProductList);
-
-      // Initialize selected variants with first option
-      const initialVariants: Record<string, string> = {};
-      finalProductList.forEach(p => {
-        if (p.catalogItem && p.catalogItem.variants.length > 0) {
-          initialVariants[p.id] = p.catalogItem.variants[0].option;
-        }
-      });
-      setSelectedVariants(initialVariants);
+      applyProductList(Array.from(reconciledMap.values()));
     } catch (err: any) {
-      console.error('❌ Error fetching products:', err);
-      setError(err.message || 'Failed to load products');
+      console.error("❌ Drive enrich failed (catalog still shown):", err);
+      // Catalog already painted — only error if we have nothing
+      if (catalogList.length === 0) {
+        setError(err?.name === "AbortError"
+          ? "Taking too long to load. Please try again."
+          : err?.message || "Failed to load products");
+      }
     } finally {
       setLoading(false);
     }
@@ -377,9 +419,24 @@ export default function CategoryPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusinessSchema) }}
       />
 
-      {/* Decorative Background */}
-      <div className="fixed inset-0 pointer-events-none opacity-5 scroll-smooth">
-        <Image src="/sacred_remedies.png" alt="background" fill className="object-cover" />
+      {/* Category banner strip */}
+      <div className="relative w-full h-36 sm:h-48 md:h-56 overflow-hidden">
+        <Image
+          src={categoryBanner}
+          alt={categoryName}
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover object-center"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/20 to-transparent" />
+        <div className="absolute inset-x-0 bottom-0 p-4 sm:p-6">
+          <div className="max-w-7xl mx-auto">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-black text-white drop-shadow product-title">
+              {categoryName}
+            </h1>
+          </div>
+        </div>
       </div>
       {/* Header with Back Anchor and Category Switcher */}
       <div className="bg-white/80 backdrop-blur-md border-b border-amber-200 sticky top-0 z-50 shadow-sm">
@@ -399,18 +456,19 @@ export default function CategoryPage() {
                 {tCommon("categories")}:
               </span>
               {allCategories.map((cat) => {
-                const isCurrent = cat.name.toLowerCase() === categoryName.toLowerCase();
+                const label = resolveCatalogCategory(cat.name);
+                const isCurrent = label.toLowerCase() === categoryName.toLowerCase();
                 return (
                   <button
                     key={cat.id}
-                    onClick={() => router.push(`/remedies/${encodeURIComponent(cat.name.replace(/\s+/g, '-'))}`)}
+                    onClick={() => router.push(`/remedies/${encodeURIComponent(label.replace(/\s+/g, "-"))}`)}
                     className={`px-3 py-1.5 rounded-full text-xs font-black tracking-tight whitespace-nowrap transition-all border ${
                       isCurrent
                         ? "bg-amber-500 text-slate-950 border-amber-400 shadow-sm font-black"
                         : "bg-amber-50/60 text-slate-700 hover:bg-amber-100/80 border-amber-200/80"
                     }`}
                   >
-                    {cat.name}
+                    {label}
                   </button>
                 );
               })}
@@ -422,22 +480,7 @@ export default function CategoryPage() {
       {/* Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
         {/* Category Header */}
-        {getCategoryHeroBanner(categoryName) && (
-          <div className="relative w-full max-w-4xl mx-auto h-44 sm:h-72 md:h-80 rounded-2xl sm:rounded-3xl overflow-hidden shadow-2xl mb-8 border border-amber-200">
-            <Image
-              src={getCategoryHeroBanner(categoryName)!}
-              alt={categoryName}
-              fill
-              priority
-              className="object-cover"
-            />
-          </div>
-        )}
-
         <div className="text-center mb-8 sm:mb-10">
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-slate-900 mb-3 capitalize">
-            {categoryName}
-          </h1>
           <p className="text-slate-700 text-sm sm:text-lg max-w-2xl mx-auto mb-4">
             {t("discover", { category: categoryName.toLowerCase() })}
           </p>
@@ -594,7 +637,7 @@ export default function CategoryPage() {
                       <button
                         onClick={() => setDetailModalProduct(product)}
                         className="text-slate-400 hover:text-amber-600 transition-colors"
-                        title={t("understandRemedy")}
+                        title="View Remedy Guidance"
                       >
                         <HelpCircle className="w-3.5 h-3.5" />
                       </button>
@@ -657,7 +700,7 @@ export default function CategoryPage() {
                               productName: product.name,
                               categoryName: product.category,
                               selectedVariant: currentVariant,
-                              enquiryType: "consultation_request"
+                              enquiryType: "product_enquiry"
                             })}
                             className="w-full text-center text-[9px] sm:text-[10px] font-bold text-slate-500 hover:text-amber-600 py-0.5 transition-colors"
                           >
@@ -672,7 +715,7 @@ export default function CategoryPage() {
                               productName: product.name,
                               categoryName: product.category,
                               selectedVariant: currentVariant,
-                              enquiryType: "consultation_request"
+                              enquiryType: "product_enquiry"
                             })}
                             className="w-full px-2 sm:px-4 py-2 sm:py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-black rounded-xl shadow-md transition-all duration-300 flex items-center justify-center gap-1.5 sm:gap-2 text-[10px] sm:text-sm"
                           >
@@ -707,7 +750,7 @@ export default function CategoryPage() {
                               productName: product.name,
                               categoryName: product.category,
                               selectedVariant: currentVariant,
-                              enquiryType: "consultation_request"
+                              enquiryType: "product_enquiry"
                             })}
                             className="w-full text-center text-[9px] sm:text-[10px] font-bold text-slate-500 hover:text-amber-600 py-0.5 transition-colors"
                           >
@@ -723,26 +766,47 @@ export default function CategoryPage() {
           </div>
         )}
 
-        {/* Physical product support only — no consultation / energy-score services */}
+        {/* 11. "NOT SURE WHAT YOU NEED?" STORE-WIDE SALES FUNNEL SECTION */}
         <div className="mt-16 md:mt-24 max-w-4xl mx-auto">
-          <div className="relative rounded-3xl bg-stone-900 text-white p-8 sm:p-12 overflow-hidden shadow-2xl border border-amber-400/20">
+          <div className="relative rounded-3xl bg-gradient-to-br from-amber-900 via-slate-900 to-amber-950 text-white p-8 sm:p-12 overflow-hidden shadow-2xl border border-amber-400/30">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-amber-500/10 blur-[60px] rounded-full pointer-events-none" />
+            
             <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8 text-center md:text-left">
               <div className="space-y-3 max-w-xl">
-                <h3 className="text-2xl sm:text-3xl font-bold tracking-tight text-white">
-                  Need help choosing a physical product?
+                <div className="inline-flex items-center gap-2 px-3 py-1 bg-amber-500/20 border border-amber-400/30 rounded-full text-[10px] font-black text-amber-300 uppercase tracking-widest">
+                  <Compass className="w-3.5 h-3.5 text-amber-400 animate-spin" style={{ animationDuration: "12s" }} />
+                  {t("funnelBadge")}
+                </div>
+                <h3 className="text-2xl sm:text-3xl font-black tracking-tight text-white">
+                  {t("funnelTitle")}
                 </h3>
-                <p className="text-amber-100/90 text-sm sm:text-base leading-relaxed">
-                  Contact us for product availability, specifications, or shipping questions.
-                  This store sells physical Vastu and religious products only — not consultations or astrology services.
+                <p className="text-amber-100/90 text-sm sm:text-base font-normal leading-relaxed">
+                  {t("funnelDesc")}
                 </p>
               </div>
-              <a
-                href="/contact"
-                className="px-6 py-4 bg-amber-500 hover:bg-amber-400 text-stone-950 font-bold text-xs sm:text-sm uppercase tracking-wider rounded-2xl transition-all flex items-center justify-center gap-2"
-              >
-                <MessageCircle className="w-4 h-4" />
-                <span>Contact Us</span>
-              </a>
+
+              <div className="flex flex-col sm:flex-row md:flex-col gap-3 w-full md:w-auto flex-shrink-0">
+                <button
+                  onClick={() => setEnquiryModalData({
+                    isOpen: true,
+                    productName: `Product Enquiry (${categoryName})`,
+                    categoryName: categoryName,
+                    enquiryType: "product_enquiry"
+                  })}
+                  className="px-6 py-4 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-black text-xs sm:text-sm uppercase tracking-wider rounded-2xl shadow-xl shadow-amber-500/25 hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-2"
+                >
+                  <MessageCircle className="w-4 h-4 fill-current" />
+                  <span>{t("talkVastuExpert")}</span>
+                </button>
+
+                <button
+                  onClick={() => setIsEnergyModalOpen(true)}
+                  className="px-6 py-3.5 bg-white/10 hover:bg-white/20 text-amber-200 border border-amber-300/30 font-black text-xs sm:text-sm uppercase tracking-wider rounded-2xl backdrop-blur-md transition-all flex items-center justify-center gap-2"
+                >
+                  <Sparkles className="w-4 h-4 text-amber-300" />
+                  <span>{t("checkHomeEnergy")}</span>
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -779,7 +843,7 @@ export default function CategoryPage() {
         formattedPrice={detailModalProduct ? formatPrice(detailModalProduct) : ""}
       />
 
-      {/* Product Enquiry / WhatsApp Funnel Modal */}
+      {/* Product Enquiry / Enquiry Modal */}
       <ProductEnquiryModal
         isOpen={enquiryModalData.isOpen}
         onClose={() => setEnquiryModalData(prev => ({ ...prev, isOpen: false }))}
@@ -789,6 +853,11 @@ export default function CategoryPage() {
         enquiryType={enquiryModalData.enquiryType}
       />
 
+      {/* Interactive Home Energy Score Modal */}
+      <HomeEnergyScoreModal
+        isOpen={isEnergyModalOpen}
+        onClose={() => setIsEnergyModalOpen(false)}
+      />
     </div>
   );
 }

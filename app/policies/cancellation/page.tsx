@@ -39,14 +39,15 @@ export default function CancellationPage() {
           method. Bank processing times may vary.
         </p>
         <p>
-          To cancel, call or WhatsApp{" "}
+          To cancel, email{" "}
           <a
-            href={`tel:+${BUSINESS.phoneE164}`}
+            href={`mailto:${BUSINESS.email}`}
             className="font-medium text-amber-800 underline-offset-2 hover:underline"
           >
-            {BUSINESS.phoneDisplay}
+            {BUSINESS.email}
           </a>{" "}
-          during {BUSINESS.workingHours} with your order ID.
+          or call {BUSINESS.phoneDisplay} during {BUSINESS.workingHours} with
+          your order ID.
         </p>
       </PolicySection>
 
@@ -113,7 +114,7 @@ export default function CancellationPage() {
           >
             Contact us
           </Link>{" "}
-          · {BUSINESS.phoneDisplay}
+          · {BUSINESS.email}
         </p>
       </PolicySection>
     </PolicyLayout>

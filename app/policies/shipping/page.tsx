@@ -33,12 +33,12 @@ export default function ShippingPage() {
         <p>
           We currently ship to serviceable PIN codes across India through
           recognised courier partners. If your location is not serviceable at
-          checkout, please call or WhatsApp{" "}
+          checkout, please contact{" "}
           <a
-            href={`tel:+${BUSINESS.phoneE164}`}
+            href={`mailto:${BUSINESS.email}`}
             className="font-medium text-amber-800 underline-offset-2 hover:underline"
           >
-            {BUSINESS.phoneDisplay}
+            {BUSINESS.email}
           </a>{" "}
           before placing an order.
         </p>
@@ -65,8 +65,8 @@ export default function ShippingPage() {
         </p>
         {/* OWNER CONFIRMATION: carrier names and published SLA ranges */}
         <p>
-          Tracking information (where available) is shared by phone, WhatsApp,
-          or SMS after dispatch.
+          Tracking information (where available) is shared by email or SMS
+          after dispatch.
         </p>
       </PolicySection>
 
@@ -116,7 +116,7 @@ export default function ShippingPage() {
 
       <PolicySection title="9. Contact">
         <p>
-          Shipping questions: Call / WhatsApp {BUSINESS.phoneDisplay} ·{" "}
+          Shipping questions: {BUSINESS.email} · {BUSINESS.phoneDisplay} ·{" "}
           {BUSINESS.workingHours}. See also{" "}
           <Link
             href="/contact"

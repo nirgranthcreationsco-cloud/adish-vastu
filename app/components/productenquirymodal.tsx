@@ -1,9 +1,11 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { X, MessageCircle, Send, Sparkles, CheckCircle2, ShieldCheck, HelpCircle } from "lucide-react";
+import { X, Send, Sparkles, CheckCircle2, ShieldCheck } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { supabase } from "@/supabase";
+
+export type EnquiryType = "price_request" | "product_enquiry";
 
 interface ProductEnquiryModalProps {
   isOpen: boolean;
@@ -11,7 +13,7 @@ interface ProductEnquiryModalProps {
   productName: string;
   categoryName: string;
   selectedVariant?: string;
-  enquiryType: "price_request" | "consultation_request";
+  enquiryType: EnquiryType;
 }
 
 export default function ProductEnquiryModal({
@@ -61,73 +63,33 @@ export default function ProductEnquiryModal({
     return Object.keys(errs).length === 0;
   };
 
-  const getWhatsAppMessage = () => {
-    const itemDesc = selectedVariant ? `${productName} — ${selectedVariant}` : productName;
-    if (enquiryType === "price_request") {
-      let text = `Namaste, I am interested in the *${itemDesc}* (Category: ${categoryName}). Please share the current price, availability, and ordering details.`;
-      if (quantity && quantity !== "1") {
-        text += `\nQuantity Required: ${quantity}`;
-      }
-      if (name.trim()) {
-        text += `\nFrom: ${name.trim()}`;
-      }
-      if (message.trim()) {
-        text += `\nNote: ${message.trim()}`;
-      }
-      return encodeURIComponent(text);
-    } else {
-      let text = `Namaste, I would like expert guidance regarding the right Vastu remedy for *${itemDesc}*. Please connect me with a Vastu consultant.`;
-      if (name.trim()) {
-        text += `\nFrom: ${name.trim()}`;
-      }
-      if (message.trim()) {
-        text += `\nRequirement / Concern: ${message.trim()}`;
-      }
-      return encodeURIComponent(text);
-    }
-  };
-
-  const handleWhatsAppRedirect = async () => {
-    if (!validate()) return;
-    setIsSubmitting(true);
-    
-    try {
-      // Save lead in Supabase in background
-      await supabase.from("contact_requests").insert({
-        name: name.trim(),
-        phone: phone.trim(),
-        service: `Product ${enquiryType === "price_request" ? "Price Request" : "Consultation"}: ${productName}${selectedVariant ? ` (${selectedVariant})` : ""}`,
-        message: `Enquiry Type: ${enquiryType} | Variant: ${selectedVariant || "Standard"} | Qty: ${quantity} | Note: ${message.trim() || "WhatsApp Clickout"}`,
-      });
-    } catch (err) {
-      console.error("Lead tracking error:", err);
-    } finally {
-      setIsSubmitting(false);
-      // WhatsApp official business line
-      const waUrl = `https://wa.me/919999999999?text=${getWhatsAppMessage()}`;
-      window.open(waUrl, "_blank");
-      setIsSuccess(true);
-    }
-  };
-
   const handleSubmitLead = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validate()) return;
     setIsSubmitting(true);
 
+    const kind =
+      enquiryType === "price_request" ? "Price Request" : "Product Enquiry";
+
     try {
       const { error } = await supabase.from("contact_requests").insert({
         name: name.trim(),
         phone: phone.trim(),
-        service: `Product ${enquiryType === "price_request" ? "Price Request" : "Consultation"}: ${productName}${selectedVariant ? ` (${selectedVariant})` : ""}`,
-        message: `Enquiry Type: ${enquiryType} | Variant: ${selectedVariant || "Standard"} | Qty: ${quantity} | Note: ${message.trim() || "Direct Submission"}`,
+        service: `Product ${kind}: ${productName}${selectedVariant ? ` (${selectedVariant})` : ""}`,
+        message: [
+          `Enquiry Type: ${enquiryType}`,
+          `Category: ${categoryName}`,
+          `Variant: ${selectedVariant || "Standard"}`,
+          `Qty: ${quantity}`,
+          `Note: ${message.trim() || "—"}`,
+        ].join(" | "),
       });
 
       if (error) throw error;
       setIsSuccess(true);
     } catch (err: any) {
       console.error("Submission error:", err);
-      alert(err.message || "Failed to submit enquiry. Please try WhatsApp.");
+      alert(err.message || "Failed to submit enquiry. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
@@ -135,11 +97,10 @@ export default function ProductEnquiryModal({
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/70 backdrop-blur-md animate-fadeIn">
-      <div 
+      <div
         className="relative w-full max-w-lg bg-white rounded-3xl shadow-2xl border border-amber-200/80 overflow-hidden flex flex-col max-h-[90vh]"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Header with Luxury Vedic Styling */}
         <div className="bg-gradient-to-r from-amber-600 via-amber-700 to-orange-700 text-white p-6 sm:p-7 relative flex-shrink-0">
           <button
             onClick={onClose}
@@ -160,27 +121,32 @@ export default function ProductEnquiryModal({
           </p>
         </div>
 
-        {/* Selected Product Summary Card */}
         <div className="bg-amber-50/80 border-b border-amber-200/60 px-6 py-3.5 flex items-center justify-between">
           <div className="flex-1 min-w-0 pr-3">
-            <p className="text-[10px] font-bold text-amber-800 uppercase tracking-wider">{categoryName}</p>
+            <p className="text-[10px] font-bold text-amber-800 uppercase tracking-wider">
+              {categoryName}
+            </p>
             <h4 className="text-sm font-black text-slate-900 truncate">
-              {productName} {selectedVariant && <span className="text-amber-700">({selectedVariant})</span>}
+              {productName}{" "}
+              {selectedVariant && (
+                <span className="text-amber-700">({selectedVariant})</span>
+              )}
             </h4>
           </div>
           <span className="px-2.5 py-1 bg-amber-200/80 text-amber-900 rounded-lg text-[10px] font-black uppercase tracking-wider whitespace-nowrap">
-            Official Remedy
+            {t("physicalProduct")}
           </span>
         </div>
 
-        {/* Content Body */}
         <div className="p-6 sm:p-7 overflow-y-auto flex-1">
           {isSuccess ? (
             <div className="py-8 text-center space-y-4">
-              <div className="w-16 h-16 bg-emerald-100 border border-emerald-300 text-emerald-600 rounded-full flex items-center justify-center mx-auto animate-bounce">
+              <div className="w-16 h-16 bg-emerald-100 border border-emerald-300 text-emerald-600 rounded-full flex items-center justify-center mx-auto">
                 <CheckCircle2 className="w-9 h-9" />
               </div>
-              <h4 className="text-2xl font-black text-slate-900">{t("successTitle")}</h4>
+              <h4 className="text-2xl font-black text-slate-900">
+                {t("successTitle")}
+              </h4>
               <p className="text-sm text-slate-600 max-w-sm mx-auto leading-relaxed">
                 {t("successMsg")}
               </p>
@@ -204,9 +170,15 @@ export default function ProductEnquiryModal({
                   placeholder={t("namePh")}
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className={`w-full px-4 py-3 bg-slate-50 border ${errors.name ? "border-red-400 bg-red-50/20" : "border-slate-200"} rounded-xl text-slate-900 text-sm font-semibold outline-none focus:border-amber-500 focus:bg-white transition-all`}
+                  className={`w-full px-4 py-3 bg-slate-50 border ${
+                    errors.name ? "border-red-400 bg-red-50/20" : "border-slate-200"
+                  } rounded-xl text-slate-900 text-sm font-semibold outline-none focus:border-amber-500 focus:bg-white transition-all`}
                 />
-                {errors.name && <p className="text-red-500 text-[11px] font-semibold mt-1">{errors.name}</p>}
+                {errors.name && (
+                  <p className="text-red-500 text-[11px] font-semibold mt-1">
+                    {errors.name}
+                  </p>
+                )}
               </div>
 
               <div>
@@ -214,16 +186,28 @@ export default function ProductEnquiryModal({
                   {t("phone")} <span className="text-red-500">*</span>
                 </label>
                 <div className="relative flex items-center">
-                  <span className="absolute left-3.5 text-xs font-bold text-slate-500 pointer-events-none">+91</span>
+                  <span className="absolute left-3.5 text-xs font-bold text-slate-500 pointer-events-none">
+                    +91
+                  </span>
                   <input
                     type="tel"
                     placeholder={t("phonePh")}
                     value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    className={`w-full pl-12 pr-4 py-3 bg-slate-50 border ${errors.phone ? "border-red-400 bg-red-50/20" : "border-slate-200"} rounded-xl text-slate-900 text-sm font-semibold outline-none focus:border-amber-500 focus:bg-white transition-all`}
+                    onChange={(e) =>
+                      setPhone(e.target.value.replace(/\D/g, "").slice(0, 10))
+                    }
+                    className={`w-full pl-12 pr-4 py-3 bg-slate-50 border ${
+                      errors.phone
+                        ? "border-red-400 bg-red-50/20"
+                        : "border-slate-200"
+                    } rounded-xl text-slate-900 text-sm font-semibold outline-none focus:border-amber-500 focus:bg-white transition-all`}
                   />
                 </div>
-                {errors.phone && <p className="text-red-500 text-[11px] font-semibold mt-1">{errors.phone}</p>}
+                {errors.phone && (
+                  <p className="text-red-500 text-[11px] font-semibold mt-1">
+                    {errors.phone}
+                  </p>
+                )}
               </div>
 
               {enquiryType === "price_request" && (
@@ -249,7 +233,7 @@ export default function ProductEnquiryModal({
                   {t("message")}
                 </label>
                 <textarea
-                  rows={2}
+                  rows={3}
                   placeholder={t("messagePh")}
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
@@ -257,31 +241,20 @@ export default function ProductEnquiryModal({
                 />
               </div>
 
-              {/* Action Buttons */}
-              <div className="pt-2 space-y-2.5">
-                <button
-                  type="button"
-                  onClick={handleWhatsAppRedirect}
-                  disabled={isSubmitting}
-                  className="w-full py-3.5 px-4 bg-emerald-600 hover:bg-emerald-700 active:scale-[0.99] text-white font-black text-sm rounded-xl shadow-lg shadow-emerald-600/25 flex items-center justify-center gap-2 transition-all group"
-                >
-                  <MessageCircle className="w-5 h-5 fill-current" />
-                  <span>{t("whatsapp")}</span>
-                </button>
-
+              <div className="pt-2">
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full py-3 px-4 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 transition-all"
+                  className="w-full py-3.5 px-4 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 active:scale-[0.99] text-white font-black text-sm rounded-xl shadow-lg shadow-amber-500/25 flex items-center justify-center gap-2 transition-all disabled:opacity-70"
                 >
-                  <Send className="w-3.5 h-3.5 text-slate-500" />
+                  <Send className="w-4 h-4" />
                   <span>{isSubmitting ? t("submitting") : t("submit")}</span>
                 </button>
               </div>
 
               <div className="flex items-center justify-center gap-1.5 pt-2 text-[10px] font-semibold text-slate-400">
                 <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
-                <span>100% Confidential • Direct Contact with Jain Vastu Solutions Team</span>
+                <span>{t("confidential")}</span>
               </div>
             </form>
           )}

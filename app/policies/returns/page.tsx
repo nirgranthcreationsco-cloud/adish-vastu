@@ -66,12 +66,12 @@ export default function ReturnsPage() {
 
       <PolicySection title="5. How to request a return">
         <p>
-          Call or WhatsApp{" "}
+          Email{" "}
           <a
-            href={`tel:+${BUSINESS.phoneE164}`}
+            href={`mailto:${BUSINESS.email}`}
             className="font-medium text-amber-800 underline-offset-2 hover:underline"
           >
-            {BUSINESS.phoneDisplay}
+            {BUSINESS.email}
           </a>{" "}
           with your order ID, item name, reason, and clear photographs. We will
           confirm eligibility and return instructions typically within{" "}
@@ -121,7 +121,7 @@ export default function ReturnsPage() {
 
       <PolicySection title="9. Contact & grievances">
         <p>
-          Call / WhatsApp {BUSINESS.phoneDisplay}. Unresolved issues: see{" "}
+          {BUSINESS.email} · {BUSINESS.phoneDisplay}. Unresolved issues: see{" "}
           <Link
             href="/contact"
             className="font-medium text-amber-800 underline-offset-2 hover:underline"

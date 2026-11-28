@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import { X, ShoppingCart, MessageCircle, Sparkles, CheckCircle2, HelpCircle, Shield, ChevronRight } from "lucide-react";
 import { CatalogProduct, getEducationalInfo, getProductStatus, ProductStatus } from "@/app/data/productCatalog";
+import { useTranslations } from "next-intl";
 
 interface ProductDetailModalProps {
   isOpen: boolean;
@@ -18,7 +19,7 @@ interface ProductDetailModalProps {
   selectedVariant?: string;
   onSelectVariant: (variant: string) => void;
   onAddToCart: () => void;
-  onOpenEnquiry: (type: "price_request" | "consultation_request") => void;
+  onOpenEnquiry: (type: "price_request" | "product_enquiry") => void;
   formattedPrice: string;
 }
 
@@ -32,6 +33,9 @@ export default function ProductDetailModal({
   onOpenEnquiry,
   formattedPrice,
 }: ProductDetailModalProps) {
+  const t = useTranslations("shop");
+  const tCommon = useTranslations("common");
+
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = "hidden";
@@ -89,7 +93,7 @@ export default function ProductDetailModal({
             <div className="absolute bottom-3 left-4 px-3 py-1 bg-amber-500/20 border border-amber-400/40 rounded-full backdrop-blur-md">
               <span className="text-[10px] font-black text-amber-200 uppercase tracking-widest flex items-center gap-1">
                 <Sparkles className="w-3 h-3 text-amber-400" />
-                Personally Energized & Certified
+                {tCommon("personallyEnergized")}
               </span>
             </div>
           </div>
@@ -113,7 +117,7 @@ export default function ProductDetailModal({
                 ) : (
                   <div className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-amber-100/80 border border-amber-300 rounded-xl text-amber-900 text-xs font-black uppercase tracking-wider">
                     <Sparkles className="w-3.5 h-3.5 text-amber-600" />
-                    {status === "CONSULTATION_REQUIRED" ? "Recommended after consultation" : "Price on Request"}
+                    {status === "CONSULTATION_REQUIRED" ? t("afterConsultation") : t("priceOnRequest")}
                   </div>
                 )}
               </div>
@@ -123,7 +127,7 @@ export default function ProductDetailModal({
             {product.catalogItem && product.catalogItem.variants.length > 0 && (
               <div className="bg-amber-50/60 border border-amber-200/80 p-4 rounded-2xl">
                 <label className="block text-xs font-black text-slate-700 uppercase tracking-wider mb-2">
-                  Select Size / Specification:
+                  {t("selectSpec")}:
                 </label>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                   {product.catalogItem.variants.map((v) => {
@@ -146,7 +150,7 @@ export default function ProductDetailModal({
                           </span>
                         ) : (
                           <span className={`text-[9px] font-medium mt-1 ${isSelected ? "text-amber-200" : "text-slate-500"}`}>
-                            On Request
+                            {t("onRequest")}
                           </span>
                         )}
                       </button>
@@ -161,7 +165,7 @@ export default function ProductDetailModal({
               <div className="bg-slate-50 border border-slate-200/80 p-4 rounded-2xl space-y-1">
                 <h4 className="text-xs font-black text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
                   <span className="w-2 h-2 rounded-full bg-amber-500" />
-                  What is it?
+                  {t("whatIsIt")}
                 </h4>
                 <p className="text-xs text-slate-600 leading-relaxed font-medium">
                   {info.whatIsIt}
@@ -171,7 +175,7 @@ export default function ProductDetailModal({
               <div className="bg-slate-50 border border-slate-200/80 p-4 rounded-2xl space-y-1">
                 <h4 className="text-xs font-black text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
                   <span className="w-2 h-2 rounded-full bg-orange-500" />
-                  Why is it used?
+                  {t("whyUsed")}
                 </h4>
                 <p className="text-xs text-slate-600 leading-relaxed font-medium">
                   {info.whyUsed}
@@ -181,7 +185,7 @@ export default function ProductDetailModal({
               <div className="bg-slate-50 border border-slate-200/80 p-4 rounded-2xl space-y-1">
                 <h4 className="text-xs font-black text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
                   <span className="w-2 h-2 rounded-full bg-emerald-500" />
-                  Who is it suitable for?
+                  {t("suitableFor")}
                 </h4>
                 <p className="text-xs text-slate-600 leading-relaxed font-medium">
                   {info.suitableFor}
@@ -191,7 +195,7 @@ export default function ProductDetailModal({
               <div className="bg-slate-50 border border-slate-200/80 p-4 rounded-2xl space-y-1">
                 <h4 className="text-xs font-black text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
                   <span className="w-2 h-2 rounded-full bg-blue-500" />
-                  How is it activated?
+                  {t("howActivated")}
                 </h4>
                 <p className="text-xs text-slate-600 leading-relaxed font-medium">
                   {info.howUsed}
@@ -203,21 +207,21 @@ export default function ProductDetailModal({
             <div className="bg-gradient-to-r from-amber-500/10 via-orange-500/10 to-amber-500/10 border border-amber-300 rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row items-center justify-between gap-4">
               <div className="space-y-0.5 text-center sm:text-left">
                 <h5 className="text-sm font-black text-slate-900">
-                  Not sure which remedy is right for your space?
+                  {t("funnelTitle")}
                 </h5>
                 <p className="text-xs text-slate-600">
-                  Speak with our certified Vastu experts for directional placement advice.
+                  {t("funnelDesc")}
                 </p>
               </div>
               <button
                 onClick={() => {
                   onClose();
-                  onOpenEnquiry("consultation_request");
+                  onOpenEnquiry("product_enquiry");
                 }}
                 className="px-4 py-2.5 bg-white hover:bg-slate-50 text-amber-900 font-bold text-xs rounded-xl border border-amber-300 shadow-sm flex items-center gap-1.5 whitespace-nowrap transition-all"
               >
                 <HelpCircle className="w-3.5 h-3.5 text-amber-600" />
-                <span>Talk to a Vastu Expert</span>
+                <span>{t("talkVastuExpert")}</span>
               </button>
             </div>
           </div>
@@ -226,8 +230,8 @@ export default function ProductDetailModal({
         {/* Modal Bottom Sticky CTA Bar */}
         <div className="bg-slate-50 border-t border-slate-200/80 p-4 sm:p-5 flex items-center justify-between gap-3">
           <div className="hidden sm:block">
-            <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Purchase or Enquiry</p>
-            <p className="text-base font-black text-slate-900">{isPriced ? formattedPrice : "Direct Follow-up"}</p>
+            <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">{t("purchaseOrEnquiry")}</p>
+            <p className="text-base font-black text-slate-900">{isPriced ? formattedPrice : t("priceOnRequest")}</p>
           </div>
 
           <div className="flex items-center gap-2 w-full sm:w-auto">
@@ -240,18 +244,18 @@ export default function ProductDetailModal({
                 className="flex-1 sm:flex-none px-6 py-3.5 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-black text-sm rounded-xl shadow-lg shadow-amber-500/20 flex items-center justify-center gap-2 transition-all"
               >
                 <ShoppingCart className="w-4 h-4" />
-                <span>Add to Cart ({formattedPrice})</span>
+                <span>{t("addToCart")} ({formattedPrice})</span>
               </button>
             ) : status === "CONSULTATION_REQUIRED" ? (
               <button
                 onClick={() => {
                   onClose();
-                  onOpenEnquiry("consultation_request");
+                  onOpenEnquiry("product_enquiry");
                 }}
                 className="flex-1 sm:flex-none px-6 py-3.5 bg-gradient-to-r from-amber-600 to-orange-600 text-white font-black text-sm rounded-xl shadow-lg flex items-center justify-center gap-2 transition-all"
               >
                 <HelpCircle className="w-4 h-4" />
-                <span>Talk to a Vastu Expert</span>
+                <span>{t("talkVastuExpert")}</span>
               </button>
             ) : (
               <button
@@ -262,17 +266,17 @@ export default function ProductDetailModal({
                 className="flex-1 sm:flex-none px-6 py-3.5 bg-gradient-to-r from-amber-600 to-orange-600 text-white font-black text-sm rounded-xl shadow-lg flex items-center justify-center gap-2 transition-all"
               >
                 <MessageCircle className="w-4 h-4" />
-                <span>Get Latest Price →</span>
+                <span>{t("getPrice")}</span>
               </button>
             )}
 
             <button
               onClick={() => {
                 onClose();
-                onOpenEnquiry("consultation_request");
+                onOpenEnquiry("product_enquiry");
               }}
               className="p-3.5 bg-white border border-slate-200 text-slate-700 hover:bg-slate-100 rounded-xl transition-all"
-              title="Ask an Expert"
+              title={t("talkExpert")}
             >
               <HelpCircle className="w-4 h-4 text-amber-600" />
             </button>

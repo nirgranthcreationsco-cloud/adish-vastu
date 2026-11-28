@@ -76,13 +76,16 @@ export default function ContactsPage() {
     const rawPhone = getCleanPhone(contact.phone || "");
     const phone = rawPhone.length === 10 ? `91${rawPhone}` : rawPhone;
     const isPriceReq = contact.service?.toLowerCase().includes("price request");
-    const isConsultation = contact.service?.toLowerCase().includes("consultation");
+    const isProductEnquiry =
+      contact.service?.toLowerCase().includes("product enquiry") ||
+      contact.service?.toLowerCase().includes("consultation") ||
+      contact.message?.toLowerCase().includes("product_enquiry");
     
-    let text = `Namaste ${contact.name},\nThank you for connecting with Jain Vastu Solutions regarding *${contact.service}*.`;
+    let text = `Namaste ${contact.name},\nThank you for your product enquiry with Jain Vastu Solutions regarding *${contact.service}*.`;
     if (isPriceReq) {
-      text += `\nWe are pleased to share the current official pricing and remedy specifications with you.`;
-    } else if (isConsultation) {
-      text += `\nOur certified Vastu consultant is available to assist you with directional guidance.`;
+      text += `\nWe will share the current product pricing and availability with you.`;
+    } else if (isProductEnquiry) {
+      text += `\nWe will help you choose the right physical product from our catalogue.`;
     }
     text += `\nHow may we assist you today?`;
 
@@ -109,7 +112,7 @@ export default function ContactsPage() {
         return serviceLower.includes("price request") || messageLower.includes("price_request");
       }
       if (activeTab === "CONSULTATIONS") {
-        return serviceLower.includes("consultation") || messageLower.includes("consultation_request");
+        return serviceLower.includes("consultation") || serviceLower.includes("product enquiry") || messageLower.includes("product_enquiry") || messageLower.includes("consultation_request");
       }
       if (activeTab === "GENERAL") {
         return !serviceLower.includes("product") && !serviceLower.includes("price request");
@@ -180,7 +183,7 @@ export default function ContactsPage() {
           >
             {tab === "ALL" && "All Enquiries"}
             {tab === "PRICE_REQUESTS" && "Price Requests"}
-            {tab === "CONSULTATIONS" && "Consultations"}
+            {tab === "CONSULTATIONS" && "Product Enquiries"}
             {tab === "GENERAL" && "General Contacts"}
           </button>
         ))}
