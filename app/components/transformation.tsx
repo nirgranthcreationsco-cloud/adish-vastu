@@ -24,7 +24,7 @@ export default function TransformationStories() {
     },
     {
       name: "Rajesh Patel",
-      location: "Ahmedabad",
+      location: "Indore",
       img: "/profile1.png",
       title: "Business Reborn",
       problem: "Heavy losses, clients leaving, no stability.",

@@ -22,7 +22,6 @@ export default function RemediesSection() {
   const [categories, setCategories] = useState<DriveFolder[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [isMockData, setIsMockData] = useState(false);
 
   useEffect(() => {
     fetchCategories();
@@ -46,7 +45,6 @@ export default function RemediesSection() {
         .slice(0, 4);
 
       setCategories(folders);
-      setIsMockData(data.isMock || false);
     } catch (err: any) {
       console.error("Error fetching categories:", err);
       setError(err.message || "Failed to load categories");
@@ -76,14 +74,6 @@ export default function RemediesSection() {
           }}
         />
       </div>
-
-      {isMockData && (
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 mb-6">
-          <div className="bg-blue-100 border-2 border-blue-300 rounded-xl p-4 text-center">
-            <p className="text-blue-900 font-semibold">🧪 {t("devMode")}</p>
-          </div>
-        </div>
-      )}
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6">
         <div className="text-center mb-14">

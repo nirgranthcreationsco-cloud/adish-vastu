@@ -10,6 +10,7 @@ export default function SiteFooter() {
   const t = useTranslations("footer");
   if (pathname?.startsWith("/admin")) return null;
 
+  // Only real routes that exist in the app
   const POLICY_LINKS = [
     { href: "/about", label: t("about") },
     { href: "/contact", label: t("contactUs") },
@@ -18,6 +19,11 @@ export default function SiteFooter() {
     { href: "/policies/cancellation", label: t("cancellation") },
     { href: "/policies/privacy", label: t("privacy") },
     { href: "/policies/terms", label: t("terms") },
+  ];
+
+  const SHOP_LINKS = [
+    { href: "/#remedies", label: t("shopRemedies") },
+    { href: "/shop", label: t("shopAll") },
   ];
 
   return (
@@ -37,6 +43,16 @@ export default function SiteFooter() {
             {t("policies")}
           </h4>
           <ul className="mt-4 space-y-2 text-sm">
+            {SHOP_LINKS.map((l) => (
+              <li key={l.href}>
+                <Link
+                  href={l.href}
+                  className="text-stone-400 transition hover:text-amber-200"
+                >
+                  {l.label}
+                </Link>
+              </li>
+            ))}
             {POLICY_LINKS.map((l) => (
               <li key={l.href}>
                 <Link
@@ -55,7 +71,6 @@ export default function SiteFooter() {
             {t("contact")}
           </h4>
           <ul className="mt-4 space-y-2 text-sm text-stone-400">
-            <li>{BUSINESS.email}</li>
             <li>{BUSINESS.phoneDisplay}</li>
             <li>{BUSINESS.addressLine}</li>
             <li>{BUSINESS.workingHours}</li>

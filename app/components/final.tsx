@@ -4,14 +4,8 @@ import { supabase } from "@/supabase";
 import {
   CheckCircle2,
   ChevronRight,
-  Facebook,
-  Instagram,
-  MapPin,
-  Phone,
   Send,
   Sparkles,
-  X,
-  Youtube,
 } from "lucide-react";
 import { useTranslations } from 'next-intl';
 import { useSearchParams } from "next/navigation";
@@ -358,61 +352,6 @@ const handleSubmit = async (e: React.MouseEvent) => {
         </div>
       </section>
 
-      {/* FOOTER */}
-      <div className="relative z-10 border-t border-white/10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-14">
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-10">
-            <div className="space-y-4">
-              <h3 className="text-xl font-bold text-slate-900">{t('academyName')}</h3>
-              <p className="text-sm text-slate-600">
-                {t('academyDesc')}
-              </p>
-            </div>
-
-            <div>
-              <h4 className="text-slate-900 font-semibold mb-4">{t('quickLinks')}</h4>
-              <ul className="space-y-2 text-sm text-slate-600">
-                <li className="hover:text-amber-700 cursor-pointer">{t('consultations')}</li>
-                <li className="hover:text-amber-700 cursor-pointer">{t('courses')}</li>
-                <li className="hover:text-amber-700 cursor-pointer">{t('remediesLink')}</li>
-                <li className="hover:text-amber-700 cursor-pointer">{t('stories')}</li>
-              </ul>
-            </div>
-
-            <div>
-              <h4 className="text-slate-900 font-semibold mb-4">{t('contact')}</h4>
-              <ul className="space-y-3 text-sm text-slate-600">
-                <li className="flex items-center gap-2">
-                  <Phone className="w-4 h-4 text-amber-700" /> +91 81036 38945
-                </li>
-                <li className="flex items-center gap-2">
-                  <MapPin className="w-4 h-4 text-amber-700" /> Ahmedabad, India
-                </li>
-              </ul>
-            </div>
-
-            <div>
-              <h4 className="text-slate-900 font-semibold mb-4">{t('follow')}</h4>
-              <div className="flex gap-4">
-                {[Instagram, Facebook, Youtube, X].map((Icon, i) => (
-                  <div
-                    key={i}
-                    className="w-10 h-10 flex items-center justify-center bg-white border border-amber-200 rounded-full hover:bg-amber-50 transition cursor-pointer group"
-                  >
-                    <Icon className="w-5 h-5 text-amber-700 group-hover:text-amber-800" />
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          <div className="text-center mt-14 border-t border-amber-200 pt-6">
-            <p className="text-xs text-slate-500">
-              © {new Date().getFullYear()} {t('academyName')} · {t('copyright')}
-            </p>
-          </div>
-        </div>
-      </div>
     </footer>
   );
 }

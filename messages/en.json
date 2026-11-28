@@ -216,7 +216,7 @@
   },
   "footer": {
     "tagline": "We sell physical religious articles, Vastu products, gemstones, and related accessories for residential and commercial use.",
-    "policies": "Policies & Info",
+    "policies": "Shop & Policies",
     "contact": "Contact",
     "payments": "Payments for physical products are processed securely via Razorpay. We do not store your card details.",
     "rights": "All rights reserved.",
@@ -226,7 +226,9 @@
     "returns": "Returns & Refunds",
     "cancellation": "Cancellation Policy",
     "privacy": "Privacy Policy",
-    "terms": "Terms & Conditions"
+    "terms": "Terms & Conditions",
+    "shopRemedies": "Shop Remedies",
+    "shopAll": "All Products"
   },
   "orderSuccess": {
     "title": "Order Placed Successfully!",

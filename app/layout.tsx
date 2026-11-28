@@ -3,6 +3,7 @@ import { Noto_Sans_Devanagari, Plus_Jakarta_Sans } from "next/font/google";
 import LanguageSwitcher from "./components/languageswitcher";
 import LocaleProvider from "./components/localeprovider";
 import PromoBanner from "./components/promobanner";
+import SiteFooter from "./components/sitefooter";
 import { CartProvider } from "./context/cartcontext";
 import "./globals.css";
 
@@ -74,7 +75,10 @@ export default function RootLayout({
           <div className="fixed top-12 left-3 z-[60] md:top-14 md:left-6">
             <LanguageSwitcher />
           </div>
-          <CartProvider>{children}</CartProvider>
+          <CartProvider>
+            {children}
+            <SiteFooter />
+          </CartProvider>
         </LocaleProvider>
       </body>
     </html>
